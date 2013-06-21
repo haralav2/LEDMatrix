@@ -89,9 +89,17 @@ buttonsColor = np.empty((8,8), dtype=object)
 # I2C bus that controls the LED matrix
 bus = smbus.SMBus(1)
 
+# For the LED matrix - we need 6 arrays - 3 for rows and 3 for columns,where we will store the corresponding addresses
+yellowRow = []
+yellowColumn = []
+greenRow = []
+greenColumn = []
+redRow = []
+redColumn = []
+    
 # Main method
 def main():
-    global FPSCLOCK, bus, DISPLAYSURF, BASICFONT, DRAW_SURF, DRAW_BUTTON, COLOR_SURF, COLOR_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, LEDColor, COLORColor, SEEColor, LEDFlashColor, COLORFlashColor,SEEFlashColor,DEMO_SURF, DEMO_BUTTON
+    global FPSCLOCK, yellowRow, yellowColumn, redRow, redColumn, greenRow, greenColumn, bus, DISPLAYSURF, BASICFONT, DRAW_SURF, DRAW_BUTTON, COLOR_SURF, COLOR_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, LEDColor, COLORColor, SEEColor, LEDFlashColor, COLORFlashColor,SEEFlashColor,DEMO_SURF, DEMO_BUTTON
 
     # Initialising the game state
     pygame.init()
@@ -101,7 +109,7 @@ def main():
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 35)
-    infoSurf = BASICFONT.render('Choose your pattern.Start by pressing DRAW,/n ', 2, DARKGRAY)
+    infoSurf = BASICFONT.render('Choose your pattern.Start by pressing DRAW,', 2, DARKGRAY)
     infoRect = infoSurf.get_rect()
     infoRect.topleft = (10, WINDOWHEIGHT - 20)
 
@@ -113,13 +121,7 @@ def main():
     # Initialize some variables for a new game
     pattern = [] # stores the pattern of LEDs clicked
 
-    # For the LED matrix - we need 6 arrays - 3 for rows and 3 for columns,where we will store the corresponding addresses
-    yellowRow = []
-    yellowColumn = []
-    greenRow = []
-    greenColumn = []
-    redRow = []
-    redColumn = []
+    
     
     # Set the color of all the LEDs to be the LEDColor
     for rows in range(0,8):
@@ -196,7 +198,11 @@ def main():
                     turnOffAll(BRIGHTRED)
                     turnOffAll(BRIGHTYELLOW)
                     turnOffAll(BRIGHTGREEN)
+                    LightPattern()
                     pygame.time.wait(5000)
+                    turnOffAll(BRIGHTRED)
+                    turnOffAll(BRIGHTYELLOW)
+                    turnOffAll(BRIGHTGREEN)
                     pattern = []
                     drawOnBoard = True
 
@@ -360,7 +366,7 @@ def flashButtonAnimationBig(color, animationSpeed=50):
             pygame.display.update()
             FPSCLOCK.tick(FPS)
     DISPLAYSURF.blit(origSurf, (0, 0))
-
+'''
 def drawButtons(color):
 
     for rows in range(0,8):
@@ -372,7 +378,7 @@ def drawButtons(color):
     DISPLAYSURF.blit(COLOR_SURF, COLOR_BUTTON)
     DISPLAYSURF.blit(SEE_SURF, SEE_BUTTON)    
     DISPLAYSURF.blit(DEMO_SURF, DEMO_BUTTON)
-
+'''
 def drawButtonWithColor(button, color):
     for rows in range(0,8):
         for columns in range(0,8):
@@ -620,14 +626,14 @@ def FlashingDot(color,animationSpeed = 50):
 
 def arraysAdd(button):
     if getButtonColor(button) == YELLOW:
-        yellowRow.append(getButtonRow(button))
-        yellowColumn.append(getButtonColumn(button))
+        yellowRow.append(1<<getButtonRow(button))
+        yellowColumn.append(1<<getButtonColumn(button))
     elif getButtonColor(button) == RED:
-        redRow.append(getButtonRow(button))
-        redColumn.append(getButtonColumn(button))
+        redRow.append(1<<getButtonRow(button))
+        redColumn.append(1<<getButtonColumn(button))
     elif getButtonColor(button) == GREEN:
-        greenRow.append(getButtonRow(button))
-        greenColumn.append(getButtonColumn(button))
+        greenRow.append(1<<getButtonRow(button))
+        greenColumn.append(1<<getButtonColumn(button))
                       
             
 ##########################################################
@@ -647,10 +653,36 @@ def turnOnLed(color,row,column):
     elif color == BRIGHTYELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
-    bus.write_byte_data(ADDRR,PORTB,0x00)
+    bus.write_byte_data(ADDRR,PORTB,1<<row)
 
 def LightPattern():
-    
+    rowSum = 0
+    columnSum = 0
+    for row in yellowRow:
+        rowSum |= row
+    for column in yellowColumn:
+        columnSum |= column
+    bus.write_byte_data(ADDRC,PORTB,columnSum)
+    bus.write_byte_data(ADDRC,PORTA,columnSum)
+    bus.write_byte_data(ADDRR,PORTB,~rowSum)
+
+    rowSum = 0
+    columnSum = 0
+    for row in redRow:
+        rowSum |= row
+    for column in redColumn:
+        columnSum |= column
+    bus.write_byte_data(ADDRC,PORTB,columnSum)
+    bus.write_byte_data(ADDRR,PORTB,~rowSum)
+
+    rowSum = 0
+    columnSum = 0
+    for row in greenRow:
+        rowSum |= row
+    for column in greenColumn:
+        columnSum |= column
+    bus.write_byte_data(ADDRC,PORTA,columnSum)
+    bus.write_byte_data(ADDRR,PORTB,~rowSum)
 
 def turnOnAll(color):
     # Turn on all LEDs
