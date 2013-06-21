@@ -86,11 +86,14 @@ for rows in range(0,8):
 # Numpy array, which stores all the colors of the corresponding buttons 
 buttonsColor = np.empty((8,8), dtype=object)
 
+# I2C bus that controls the LED matrix
 bus = smbus.SMBus(1)
 
+# Main method
 def main():
     global FPSCLOCK, bus, DISPLAYSURF, BASICFONT, DRAW_SURF, DRAW_BUTTON, COLOR_SURF, COLOR_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, LEDColor, COLORColor, SEEColor, LEDFlashColor, COLORFlashColor,SEEFlashColor,DEMO_SURF, DEMO_BUTTON
 
+    # Initialising the game state
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -98,7 +101,7 @@ def main():
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 35)
-    infoSurf = BASICFONT.render('Choose your pattern.Start by pressing DRAW,when finished - press DONE,to see what you have drawn press SEE', 1, DARKGRAY)
+    infoSurf = BASICFONT.render('Choose your pattern.Start by pressing DRAW,/n ', 2, DARKGRAY)
     infoRect = infoSurf.get_rect()
     infoRect.topleft = (10, WINDOWHEIGHT - 20)
 
@@ -110,6 +113,14 @@ def main():
     # Initialize some variables for a new game
     pattern = [] # stores the pattern of LEDs clicked
 
+    # For the LED matrix - we need 6 arrays - 3 for rows and 3 for columns,where we will store the corresponding addresses
+    yellowRow = []
+    yellowColumn = []
+    greenRow = []
+    greenColumn = []
+    redRow = []
+    redColumn = []
+    
     # Set the color of all the LEDs to be the LEDColor
     for rows in range(0,8):
         for columns in range(0,8):
@@ -122,7 +133,7 @@ def main():
 
         
         #################
-        
+        # Initialise the chip 
         initialise()
         #################
 
@@ -144,11 +155,15 @@ def main():
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
+
+                # If the pressed button was DRAW
                 if clickedButton == BLUE:
                     pygame.display.update()
                     pygame.time.wait(1000)
                     drawOnBoard = True
                     flashButtonAnimationBig(clickedButton)
+
+                # If the pressed button was COLOUR - change the color of the whole matrix
                 elif clickedButton == RED:
                     pygame.display.update()
                     pygame.time.wait(1000)
@@ -164,6 +179,8 @@ def main():
                     for rows in range(0,8):
                         for columns in range(0,8):
                             buttonsColor[rows,columns] = LEDColor
+
+                #If the pressed button was SEE - display the pattern 
                 elif clickedButton == GREEN:
                     drawOnBoard = False
                     pygame.display.update()
@@ -180,28 +197,35 @@ def main():
                     turnOffAll(BRIGHTYELLOW)
                     turnOffAll(BRIGHTGREEN)
                     pygame.time.wait(5000)
-                    turnOffAll(BRIGHTRED)
-                    turnOffAll(BRIGHTYELLOW)
-                    turnOffAll(BRIGHTGREEN)
                     pattern = []
                     drawOnBoard = True
+
+                # If the pressed button was purple - play the demo
                 elif clickedButton == PURPLE:
                     flashButtonAnimationBig(clickedButton)
                     while True:
                         for index in range(0,5):
                             FlashDisplay(BRIGHTYELLOW)
                             drawAllButtonsWithColor(RED)
+
+                            # Turn on the Leds
                             turnOffAll(BRIGHTYELLOW)
                             pygame.display.update()
                             FlashDisplay(BRIGHTRED)
                             drawAllButtonsWithColor(GREEN)
+
+                            # Turn off the Leds
                             turnOffAll(BRIGHTRED)
                             pygame.display.update()
                             FlashDisplay(BRIGHTGREEN)
                             drawAllButtonsWithColor(YELLOW)
+
+                            # Turn on the Leds
                             turnOffAll(BRIGHTGREEN)
                             pygame.display.update()
                             index = index + 1
+
+                        # Show some random shapes
                         RaspberryPi()
                         Hi()
                         FlashingDot(BRIGHTYELLOW)
@@ -217,13 +241,18 @@ def main():
                         pygame.display.update()
                         Present()
                         Candle()
-                    ChasingLights()
+                        ChasingLights()
+
+                # Deal with buttons from the matrix pressed
                 else:
                     if drawOnBoard:
                         if clickedButton in pattern:
                             pattern.remove(clickedButton)
                         else:
-                            pattern.append(clickedButton)                  
+                            pattern.append(clickedButton)
+                            arraysAdd(clickedButton)
+
+            # Changing colors of individual Leds
             elif event.type == MOUSEBUTTONUP and event.button == 3:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
@@ -231,16 +260,19 @@ def main():
                 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-        
+
+# Stop the game        
 def terminate():
     pygame.quit()
     sys.exit()
 
+# Make text appear
 def makeText(text, color, bgcolor, top, left):
     textSurf = BASICTEXTFONT.render(text, True, color, bgcolor)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
+
 
 def checkForQuit():
     for event in pygame.event.get(QUIT): # get all the QUIT events
@@ -586,6 +618,17 @@ def FlashingDot(color,animationSpeed = 50):
                     ######
             DISPLAYSURF.blit(origSurf, (0, 0))
 
+def arraysAdd(button):
+    if getButtonColor(button) == YELLOW:
+        yellowRow.append(getButtonRow(button))
+        yellowColumn.append(getButtonColumn(button))
+    elif getButtonColor(button) == RED:
+        redRow.append(getButtonRow(button))
+        redColumn.append(getButtonColumn(button))
+    elif getButtonColor(button) == GREEN:
+        greenRow.append(getButtonRow(button))
+        greenColumn.append(getButtonColumn(button))
+                      
             
 ##########################################################
 def initialise():
@@ -604,7 +647,10 @@ def turnOnLed(color,row,column):
     elif color == BRIGHTYELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
-    bus.write_byte_data(ADDRR,PORTB,0<<row)
+    bus.write_byte_data(ADDRR,PORTB,0x00)
+
+def LightPattern():
+    
 
 def turnOnAll(color):
     # Turn on all LEDs
