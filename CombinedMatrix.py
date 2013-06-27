@@ -204,6 +204,12 @@ def main():
                     turnOffAll(BRIGHTYELLOW)
                     turnOffAll(BRIGHTGREEN)
                     pattern = []
+                    yellowRow = []
+                    yellowColumn = []
+                    greenRow = []
+                    greenColumn = []
+                    redRow = []
+                    redColumn = []
                     drawOnBoard = True
 
                 # If the pressed button was purple - play the demo
@@ -625,13 +631,13 @@ def FlashingDot(color,animationSpeed = 50):
             DISPLAYSURF.blit(origSurf, (0, 0))
 
 def arraysAdd(button):
-    if getButtonColor(button) == YELLOW:
+    if getButtonColor(button) == YELLOW or getButtonColor(button) == BRIGHTYELLOW:
         yellowRow.append(1<<getButtonRow(button))
         yellowColumn.append(1<<getButtonColumn(button))
-    elif getButtonColor(button) == RED:
+    elif getButtonColor(button) == RED or getButtonColor(button) == BRIGHTRED:
         redRow.append(1<<getButtonRow(button))
         redColumn.append(1<<getButtonColumn(button))
-    elif getButtonColor(button) == GREEN:
+    elif getButtonColor(button) == GREEN or getButtonColor(button) == BRIGHTGREEN:
         greenRow.append(1<<getButtonRow(button))
         greenColumn.append(1<<getButtonColumn(button))
                       
@@ -659,21 +665,28 @@ def LightPattern():
     rowSum = 0
     columnSum = 0
     for row in yellowRow:
-        rowSum |= row
+        rowSum = rowSum | row
     for column in yellowColumn:
-        columnSum |= column
+        columnSum = columnSum | column
     bus.write_byte_data(ADDRC,PORTB,columnSum)
     bus.write_byte_data(ADDRC,PORTA,columnSum)
     bus.write_byte_data(ADDRR,PORTB,~rowSum)
 
     rowSum = 0
     columnSum = 0
-    for row in redRow:
-        rowSum |= row
-    for column in redColumn:
-        columnSum |= column
-    bus.write_byte_data(ADDRC,PORTB,columnSum)
-    bus.write_byte_data(ADDRR,PORTB,~rowSum)
+    for index in range (0,len(redRow)):
+        for index in range (0,len(redColumn)):
+            columnSum = columnSum | redColumn[index]
+        bus.write_byte_data(ADDRC,PORTB,columnSum)
+        bus.write_byte_data(ADDRR,PORTB,~redRow[index])
+        time.sleep(0.1)
+        bus.write_byte_data(ADDRC,PORTB,0x00)
+        bus.write_byte_data(ADDRR,PORTB,0x00)
+        #rowSum = rowSum | redRow[index]
+        #columnSum = columnSum | redColumn[index]
+        #bus.write_byte_data(ADDRC,PORTB,columnSum)
+        #bus.write_byte_data(ADDRR,PORTB,~rowSum)
+        #time.sleep(0.1)
 
     rowSum = 0
     columnSum = 0
