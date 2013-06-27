@@ -99,6 +99,23 @@ def turnOffLed(color,row,column):
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
     bus.write_byte_data(ADDRR,PORTB,1<<row)
     
+    
+def turnOnLeds(color,row,column):
+    # Turn on individual LED with a specific color - green,red ot yellow
+    if color == RED:
+        bus.write_byte_data(ADDRC,PORTB,column)
+    elif color == GREEN:
+        bus.write_byte_data(ADDRC,PORTA,column)
+    elif color == YELLOW:
+        bus.write_byte_data(ADDRC,PORTB,column)
+        bus.write_byte_data(ADDRC,PORTA,column)
+    bus.write_byte_data(ADDRR,PORTB,1<<row)
+
+def multiplexing(patternGreen,patternRed, count):
+    for count in range(0,count):
+        for row in range(0,8):
+            turnOnLeds(GREEN,row,~patternGreen[row])
+            turnOnLeds(RED,row,~patternRed[row])
 
 bus = smbus.SMBus(1)
 initialise()
@@ -148,6 +165,7 @@ time.sleep(0.5)
 turnOffAll(RED)
 time.sleep(0.5)
 
+
 turnOnLed(RED,1,0)
 time.sleep(0.5)
 #turnOnLed(RED,1,0)
@@ -162,3 +180,8 @@ turnOnLed(RED,2,1)
 time.sleep(0.5)
 
 turnOffAll(RED)
+
+patternGreen = [0x02,0x01,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+multiplexing(patternGreen,patternRed,1000)
