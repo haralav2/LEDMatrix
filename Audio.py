@@ -10,23 +10,31 @@ import wave
 
 bus=smbus.SMBus(1)    #Use '1' for newer Pi boards;
 
-ADDR   = 0x20         #The I2C address of MCP23017
-DIRA   = 0x00
-DIRB   = 0x01         #PortB I/O direction, by pin.0=output,1=input
-BANKA  = 0x12         #Register address for Bank A
-BANKB  = 0x13         #Register address for Bank B
+# Definitions for the MCP23017
+ADDRR = 0x20   # I2C bus address of the 23017 Rows
+ADDRC = 0x21   # I2C bus address of the 23017 Columns
+DIRA  = 0x00   # PortA I/O direction
+DIRB  = 0x01   # PortB I/O direction
+PORTA = 0x12   # PortA data register
+PORTB = 0x13   # PortB data register
+
 
 #Set up the 23017 for 16 output pins
-bus.write_byte_data(ADDR, DIRA, 0);
-bus.write_byte_data(ADDR, DIRB, 0);
+bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
+bus.write_byte_data(ADDRR,DIRB,0x00)   # All outputs on PortB address 0x20
+bus.write_byte_data(ADDRC,DIRA,0x00)   # All outputs on PortA address 0x21 - green
+bus.write_byte_data(ADDRC,DIRB,0x00)   # All outputs on PortB address 0x21 - red
+
 
 def TurnOffLEDS ():
-   bus.write_byte_data(ADDR, BANKA, 0xFF)
-   bus.write_byte_data(ADDR, BANKB, 0x00)
+   bus.write_byte_data(ADDRC,PORTA,0x00)
+   bus.write_byte_data(ADDRR,PORTB,0x00)
 
 def Set_Column(row, col):
-   bus.write_byte_data(ADDR, BANKA, col)
-   bus.write_byte_data(ADDR, BANKB, row)
+   bus.write_byte_data(ADDRR,PORTB,row)
+   bus.write_byte_data(ADDRC,PORTA, col)
+   #bus.write_byte_data(ADDR, PORTA, col)
+   #bus.write_byte_data(ADDR, PORTB, row)
    
 # Initialise matrix
 TurnOffLEDS()
