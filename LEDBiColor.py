@@ -5,6 +5,9 @@
 
 import smbus
 import time
+import sys
+import font8x8
+
 
 # Definitions for the MCP23017
 ADDRR = 0x20   # I2C bus address of the 23017 Rows
@@ -17,6 +20,7 @@ PORTB = 0x13   # PortB data register
 RED = PORTB
 GREEN = PORTA
 YELLOW = PORTA
+ledColor = GREEN
 def initialise():
     # Set all 16 pins to be output
     bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
@@ -89,7 +93,7 @@ def turnOffAll(color):
     
     
 def turnOffLed(color,row,column):
-    # Turn off individual LED with a specific color - green,red ot yellow
+    # Turn off individual LED with a specific color - green,red or yellow
     if color == RED:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
     elif color == GREEN:
@@ -101,7 +105,7 @@ def turnOffLed(color,row,column):
     
     
 def turnOnLeds(color,row,column):
-    # Turn on individual LED with a specific color - green,red ot yellow
+    # Turn on individual LED with a specific color - green,red or yellow
     if color == RED:
         bus.write_byte_data(ADDRC,PORTB,column)
     elif color == GREEN:
@@ -114,8 +118,53 @@ def turnOnLeds(color,row,column):
 def multiplexing(patternGreen,patternRed, count):
     for count in range(0,count):
         for row in range(0,8):
-            turnOnLeds(GREEN,row,~patternGreen[row])
-            turnOnLeds(RED,row,~patternRed[row])
+            turnOnLeds(GREEN,row,patternGreen[row])
+            turnOnLeds(RED,row,patternRed[row])
+
+def multiplexingText(color,pattern,count):
+    if color == RED:
+        for count in range(0,count):
+            for row in range(0,8):
+                turnOnLeds(RED,row,pattern[row])
+    if color == GREEN:
+        for count in range(0,count):
+            for row in range(0,8):
+                turnOnLeds(GREEN,row,pattern[row])
+    if color == YELLOW:
+        for count in range(0,count):
+            for row in range(0,8):
+                turnOnLeds(YELLOW,row,pattern[row])
+
+
+def displayText():
+    color = raw_input("Choose the color of your text - green,red or yellow")
+    text = raw_input("Enter some text to display:")
+    for char in text:
+        pattern = font8x8.font8x8[ord(char)]
+        multiplexingText(color,pattern,100)
+
+def charImage(character):
+    index = ord(character)
+    image = list(font8x8.font8x8[index])
+    return image
+
+def scroll(pattern,bufferText):
+    for row in range(0,8):
+        pattern[row] >>= 1
+        if bufferText[row] & 0x01:
+            pattern[row] |= 0x80
+        bufferText[row] >>= 1
+
+def textScroll(ledColor,text):
+    speed = 10
+    pattern = [0,0,0,0,0,0,0,0]
+    for char in text:
+        bufferText = charImage(char)
+        for shiftCount in range(0,8):
+            multiplexingText(ledColor,pattern,speed)
+            scroll(pattern,bufferText)
+
+
 
 bus = smbus.SMBus(1)
 initialise()
@@ -181,7 +230,23 @@ time.sleep(0.5)
 
 turnOffAll(RED)
 
-patternGreen = [0x02,0x01,0x00,0x00,0x00,0x00,0x00,0x00]
+patternGreen = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
 patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
-multiplexing(patternGreen,patternRed,1000)
+
+multiplexing(patternGreen,patternRed,100)
+
+#char = raw_input("Enter a character to display:")
+#patternGreen = font8x8.font8x8[ord(char)]
+#print char,patternGreen
+#multiplexing(patternGreen,patternRed,100)
+
+if len(sys.argv) > 2:
+    ledColor = sys.argv[1]
+    text = sys.argv[2]
+else:
+    print "Enter text to display and then press (Ctrl-D)."
+    text = sys.stdin.read()
+
+textScroll(ledColor,text)
+print "Finished"
