@@ -17,10 +17,10 @@ DIRB  = 0x01   # PortB I/O direction
 PORTA = 0x12   # PortA data register
 PORTB = 0x13   # PortB data register
 
-RED = PORTB
-GREEN = PORTA
-YELLOW = PORTA
-ledColor = GREEN
+RED = 1
+GREEN = 2
+YELLOW = 3
+ledColor = RED
 def initialise():
     # Set all 16 pins to be output
     bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
@@ -88,20 +88,11 @@ def turnOnAll(color):
         bus.write_byte_data(ADDRC,PORTA,0x00)    
     bus.write_byte_data(ADDRR,PORTA,0xFF)
 
-def turnOffAll(color):
+def turnOffAll():
+    # Turn off all LEDs
     bus.write_byte_data(ADDRR,PORTA,0x00)
     bus.write_byte_data(ADDRC,PORTB,0x00)
     bus.write_byte_data(ADDRC,PORTA,0x00)
-    # Turn off all LEDs
-    #bus.write_byte_data(ADDRR,PORTB,0xFF)
-    #if color == RED:
-    #   bus.write_byte_data(ADDRC,PORTB,0xFF)
-    #elif color == GREEN:
-    #    bus.write_byte_data(ADDRC,PORTA,0xFF)
-    #elif color == YELLOW:
-    #    bus.write_byte_data(ADDRC,PORTB,0xFF)
-    #    bus.write_byte_data(ADDRC,PORTA,0xFF)
-    
     
 def turnOffLed(color,row,column):
     # Turn off individual LED with a specific color - green,red or yellow
@@ -119,13 +110,13 @@ def turnOnLeds(color,row,column):
     # Turn on individual LED with a specific color - green,red or yellow
     if color == RED:
         bus.write_byte_data(ADDRC,PORTA,0xFF)
-        bus.write_byte_data(ADDRC,PORTB,column)
+        bus.write_byte_data(ADDRC,PORTB,~column)
     elif color == GREEN:
         bus.write_byte_data(ADDRC,PORTB,0xFF)
-        bus.write_byte_data(ADDRC,PORTA,column)
+        bus.write_byte_data(ADDRC,PORTA,~column)
     elif color == YELLOW:
-        bus.write_byte_data(ADDRC,PORTB,column)
-        bus.write_byte_data(ADDRC,PORTA,column)
+        bus.write_byte_data(ADDRC,PORTB,~column)
+        bus.write_byte_data(ADDRC,PORTA,~column)
     bus.write_byte_data(ADDRR,PORTA,1<<row)
 
 def multiplexing(patternGreen,patternRed, count):
@@ -139,14 +130,17 @@ def multiplexingText(color,pattern,count):
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(RED,row,pattern[row])
+                time.sleep(0.0001)
     if color == GREEN:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(GREEN,row,pattern[row])
+                time.sleep(0.0001)
     if color == YELLOW:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(YELLOW,row,pattern[row])
+                time.sleep(0.0001)
 
 
 def displayText():
@@ -182,76 +176,81 @@ def textScroll(ledColor,text):
 bus = smbus.SMBus(1)
 initialise()
 
-#bus.write_byte_data(ADDRR,PORTB,0xFF)
-#bus.write_byte_data(ADDRR,PORTA,0xFF)  
-#bus.write_byte_data(ADDRR,PORTB,0xFF)
+turnOnAll(YELLOW)
+time.sleep(1)
+turnOffAll()
+time.sleep(0.5)
 turnOnAll(RED)
-time.sleep(0.5)
-turnOffAll(RED)
-time.sleep(0.5)
+time.sleep(0.3)
+turnOffAll()
+time.sleep(0.3)
 turnOnAll(GREEN)
+time.sleep(0.3)
+turnOffAll()
+time.sleep(0.3)
+turnOnAll(YELLOW)
+time.sleep(1)
+turnOffAll()
 time.sleep(0.5)
-turnOffAll(GREEN)
-time.sleep(0.5)
-#turnOnAll(YELLOW)
-#time.sleep(0.5)
-#turnOffAll(YELLOW)
-#time.sleep(0.5)
 
 for row in range(0,8):
     turnOnRow(RED,row)
-    time.sleep(0.5)
-turnOffAll(RED)
+    time.sleep(0.1)
+turnOffAll()
 for row in range(0,8):
     turnOnRow(GREEN,row)
-    time.sleep(0.5)
-turnOffAll(GREEN)
+    time.sleep(0.1)
+turnOffAll()
+for row in range(0,8):
+    turnOnRow(YELLOW,row)
+    time.sleep(0.1)
+turnOffAll()
 
 for column in range(0,8):
     turnOnColumn(RED,column)
-    time.sleep(0.5)
-turnOffAll(RED)
+    time.sleep(0.1)
+turnOffAll()
 for column in range(0,8):
     turnOnColumn(GREEN,column)
-    time.sleep(0.5)
-turnOffAll(GREEN)
+    time.sleep(0.1)
+turnOffAll()
+for column in range(0,8):
+    turnOnColumn(YELLOW,column)
+    time.sleep(0.1)
+turnOffAll()
 
 for row in range(0,8):
     for column in range(0,8):
         turnOnLed(RED,row,column)
-        time.sleep(0.3)
-turnOffAll(RED)
+        time.sleep(0.1)
+turnOffAll()
 for row in range(0,8):
     for column in range(0,8):
         turnOnLed(GREEN,row,column)
-        time.sleep(0.3)
-turnOffAll(GREEN)
+        time.sleep(0.1)
+turnOffAll()
+for row in range(0,8):
+    for column in range(0,8):
+        turnOnLed(YELLOW,row,column)
+        time.sleep(0.1)
+turnOffAll()
 
-#turnOnLed(RED,1,0)
-#time.sleep(0.5)
-#time.sleep(0.5)
-#turnOnLed(RED,2,0)
-#time.sleep(0.5)
-#time.sleep(0.5)
-#turnOnLed(RED,1,1)
-#time.sleep(0.5)
-#turnOnLed(RED,2,1)
-#time.sleep(0.5)
+turnOnLed(GREEN,2,2)
+time.sleep(1)
+turnOffAll()
 
-#turnOffAll(RED)
+'''
+patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
+multiplexing(patternGreen,patternRed,500)
 
-#patternGreen = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
-#patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+if len(sys.argv) > 2:
+   ledColor = sys.argv[1]
+   text = sys.argv[2]
+else:
+    print "Enter text to display and then press (Ctrl-D)."
+    text = sys.stdin.read()
 
-
-#multiplexing(patternGreen,patternRed,100)
-
-#if len(sys.argv) > 2:
-#   ledColor = sys.argv[1]
-#    text = sys.argv[2]
-#else:
-#    print "Enter text to display and then press (Ctrl-D)."
-#    text = sys.stdin.read()
-
-#textScroll(ledColor,text)
-#print "Finished"
+textScroll(ledColor,text)
+print "Finished"
+'''
