@@ -35,25 +35,29 @@ def initialise():
 
 def turnOnColumn(color,column):
     # Turn on one column with specific color - either green,red or yellow
-    bus.write_byte_data(ADDRR,PORTB,0xFF)
     if color == RED:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
+        bus.write_byte_data(ADDRC,PORTA,0xFF)
     elif color == GREEN:
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
+        bus.write_byte_data(ADDRC,PORTB,0xFF)
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
+    bus.write_byte_data(ADDRR,PORTA,0xFF)
 
 def turnOnRow(color,row):
     # Turn on one row with specific color - either green,red or yellow    
     if color == RED:
+        bus.write_byte_data(ADDRC,PORTA,0xFF)
         bus.write_byte_data(ADDRC,PORTB,0x00) 
     elif color == GREEN:
+        bus.write_byte_data(ADDRC,PORTB,0xFF)
         bus.write_byte_data(ADDRC,PORTA,0x00)
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,0x00)
         bus.write_byte_data(ADDRC,PORTA,0x00)
-    bus.write_byte_data(ADDRR,PORTB,1<<row)
+    bus.write_byte_data(ADDRR,PORTA,1<<row)
     
 
 
@@ -61,35 +65,42 @@ def turnOnLed(color,row,column):
     # Turn on individual LED with a specific color - green,red ot yellow
     if color == RED:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
+        bus.write_byte_data(ADDRC,PORTA,0xFF)
     elif color == GREEN:
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
+        bus.write_byte_data(ADDRC,PORTB,0xFF)
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
-    bus.write_byte_data(ADDRR,PORTB,1<<row)
+    bus.write_byte_data(ADDRR,PORTA,1<<row)
     
 
 def turnOnAll(color):
     # Turn on all LEDs
     if color == RED:
+        bus.write_byte_data(ADDRC,PORTA,0xFF)
         bus.write_byte_data(ADDRC,PORTB,0x00)
     elif color == GREEN:
+        bus.write_byte_data(ADDRC,PORTB,0xFF)
         bus.write_byte_data(ADDRC,PORTA,0x00)
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,0x00)
         bus.write_byte_data(ADDRC,PORTA,0x00)    
-    bus.write_byte_data(ADDRR,PORTB,0xFF)
+    bus.write_byte_data(ADDRR,PORTA,0xFF)
 
 def turnOffAll(color):
+    bus.write_byte_data(ADDRR,PORTA,0x00)
+    bus.write_byte_data(ADDRC,PORTB,0x00)
+    bus.write_byte_data(ADDRC,PORTA,0x00)
     # Turn off all LEDs
-    bus.write_byte_data(ADDRR,PORTB,0xFF)
-    if color == RED:
-        bus.write_byte_data(ADDRC,PORTB,0xFF)
-    elif color == GREEN:
-        bus.write_byte_data(ADDRC,PORTA,0xFF)
-    elif color == YELLOW:
-        bus.write_byte_data(ADDRC,PORTB,0xFF)
-        bus.write_byte_data(ADDRC,PORTA,0xFF)
+    #bus.write_byte_data(ADDRR,PORTB,0xFF)
+    #if color == RED:
+    #   bus.write_byte_data(ADDRC,PORTB,0xFF)
+    #elif color == GREEN:
+    #    bus.write_byte_data(ADDRC,PORTA,0xFF)
+    #elif color == YELLOW:
+    #    bus.write_byte_data(ADDRC,PORTB,0xFF)
+    #    bus.write_byte_data(ADDRC,PORTA,0xFF)
     
     
 def turnOffLed(color,row,column):
@@ -101,19 +112,21 @@ def turnOffLed(color,row,column):
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
-    bus.write_byte_data(ADDRR,PORTB,1<<row)
+    bus.write_byte_data(ADDRR,PORTA,1<<row)
     
     
 def turnOnLeds(color,row,column):
     # Turn on individual LED with a specific color - green,red or yellow
     if color == RED:
+        bus.write_byte_data(ADDRC,PORTA,0xFF)
         bus.write_byte_data(ADDRC,PORTB,column)
     elif color == GREEN:
+        bus.write_byte_data(ADDRC,PORTB,0xFF)
         bus.write_byte_data(ADDRC,PORTA,column)
     elif color == YELLOW:
         bus.write_byte_data(ADDRC,PORTB,column)
         bus.write_byte_data(ADDRC,PORTA,column)
-    bus.write_byte_data(ADDRR,PORTB,1<<row)
+    bus.write_byte_data(ADDRR,PORTA,1<<row)
 
 def multiplexing(patternGreen,patternRed, count):
     for count in range(0,count):
@@ -169,84 +182,76 @@ def textScroll(ledColor,text):
 bus = smbus.SMBus(1)
 initialise()
 
-bus.write_byte_data(ADDRR,PORTB,0xFF)
-bus.write_byte_data(ADDRR,PORTA,0xFF)  
-bus.write_byte_data(ADDRR,PORTB,0xFF)
-#turnOnAll(RED)
-#time.sleep(0.5)
-#turnOffAll(RED)
-#time.sleep(0.5)
+#bus.write_byte_data(ADDRR,PORTB,0xFF)
+#bus.write_byte_data(ADDRR,PORTA,0xFF)  
+#bus.write_byte_data(ADDRR,PORTB,0xFF)
 turnOnAll(RED)
 time.sleep(0.5)
 turnOffAll(RED)
 time.sleep(0.5)
-
-#turnOnRow(RED,1)
-#time.sleep(0.5)
-#turnOffAll(RED)
-#time.sleep(0.5)
-#for row in range(0,8):
-turnOnRow(RED,2)
+turnOnAll(GREEN)
 time.sleep(0.5)
+turnOffAll(GREEN)
+time.sleep(0.5)
+#turnOnAll(YELLOW)
+#time.sleep(0.5)
+#turnOffAll(YELLOW)
+#time.sleep(0.5)
+
+for row in range(0,8):
+    turnOnRow(RED,row)
+    time.sleep(0.5)
 turnOffAll(RED)
-time.sleep(0.5)
-turnOnRow(RED,1)
-time.sleep(0.5)
+for row in range(0,8):
+    turnOnRow(GREEN,row)
+    time.sleep(0.5)
+turnOffAll(GREEN)
+
+for column in range(0,8):
+    turnOnColumn(RED,column)
+    time.sleep(0.5)
 turnOffAll(RED)
-time.sleep(0.5)
-    
+for column in range(0,8):
+    turnOnColumn(GREEN,column)
+    time.sleep(0.5)
+turnOffAll(GREEN)
 
-#turnOnColumn(RED,0)
-#time.sleep(0.5)
-#turnOffAll(RED)
-#time.sleep(0.5)
-turnOnColumn(RED,0)
-time.sleep(0.5)
+for row in range(0,8):
+    for column in range(0,8):
+        turnOnLed(RED,row,column)
+        time.sleep(0.3)
 turnOffAll(RED)
-time.sleep(0.5)
+for row in range(0,8):
+    for column in range(0,8):
+        turnOnLed(GREEN,row,column)
+        time.sleep(0.3)
+turnOffAll(GREEN)
 
-#turnOnColumn(RED,1)
-#time.sleep(0.5)
-#turnOffAll(RED)
-#time.sleep(0.5)
-turnOnColumn(RED,1)
-time.sleep(0.5)
-turnOffAll(RED)
-time.sleep(0.5)
-
-
-turnOnLed(RED,1,0)
-time.sleep(0.5)
 #turnOnLed(RED,1,0)
-time.sleep(0.5)
-turnOnLed(RED,2,0)
-time.sleep(0.5)
+#time.sleep(0.5)
+#time.sleep(0.5)
+#turnOnLed(RED,2,0)
+#time.sleep(0.5)
+#time.sleep(0.5)
 #turnOnLed(RED,1,1)
-time.sleep(0.5)
-turnOnLed(RED,1,1)
-time.sleep(0.5)
-turnOnLed(RED,2,1)
-time.sleep(0.5)
+#time.sleep(0.5)
+#turnOnLed(RED,2,1)
+#time.sleep(0.5)
 
-turnOffAll(RED)
+#turnOffAll(RED)
 
-patternGreen = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
-patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+#patternGreen = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
+#patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
 
-multiplexing(patternGreen,patternRed,100)
-
-#char = raw_input("Enter a character to display:")
-#patternGreen = font8x8.font8x8[ord(char)]
-#print char,patternGreen
 #multiplexing(patternGreen,patternRed,100)
 
-if len(sys.argv) > 2:
-    ledColor = sys.argv[1]
-    text = sys.argv[2]
-else:
-    print "Enter text to display and then press (Ctrl-D)."
-    text = sys.stdin.read()
+#if len(sys.argv) > 2:
+#   ledColor = sys.argv[1]
+#    text = sys.argv[2]
+#else:
+#    print "Enter text to display and then press (Ctrl-D)."
+#    text = sys.stdin.read()
 
-textScroll(ledColor,text)
-print "Finished"
+#textScroll(ledColor,text)
+#print "Finished"
