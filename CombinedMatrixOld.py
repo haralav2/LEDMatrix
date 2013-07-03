@@ -193,9 +193,7 @@ def main():
                     for button in pattern:
                         #flashButtonAnimation(button)
                         changeColor(button)
-                        print getButtonRow(button)
-                        print getButtonColumn(button)
-                        turnOnLed(getFlashColor(button),getButtonRow(button),getButtonColumn(button))
+                        turnOnLed(getFlashColor(button),getButtonColumn(button),getButtonRow(button))
                         pygame.time.wait(FLASHDELAY)
                     turnOffAll()
                     #LightPattern()
@@ -213,45 +211,44 @@ def main():
                 # If the pressed button was purple - play the demo
                 elif clickedButton == PURPLE:
                     flashButtonAnimationBig(clickedButton)
-                    while True:
-                        for index in range(0,5):
-                            FlashDisplay(BRIGHTYELLOW)
-                            drawAllButtonsWithColor(RED)
-
-                            # Turn on the Leds
-                            turnOffAll(BRIGHTYELLOW)
-                            pygame.display.update()
-                            FlashDisplay(BRIGHTRED)
-                            drawAllButtonsWithColor(GREEN)
-
-                            # Turn off the Leds
-                            turnOffAll(BRIGHTRED)
-                            pygame.display.update()
-                            FlashDisplay(BRIGHTGREEN)
-                            drawAllButtonsWithColor(YELLOW)
-
-                            # Turn on the Leds
-                            turnOffAll(BRIGHTGREEN)
-                            pygame.display.update()
-                            index = index + 1
-
-                        # Show some random shapes
-                        RaspberryPi()
-                        Hi()
-                        FlashingDot(BRIGHTYELLOW)
-                        ChristmasTree()
-                        drawAllButtonsWithColor(GREEN)
-                        pygame.display.update()
-                        FlashingDot(BRIGHTGREEN)
-                        Sun()
+                    for index in range(0,5):
+                        FlashDisplay(BRIGHTYELLOW)
                         drawAllButtonsWithColor(RED)
+
+                        # Turn on the Leds
+                        turnOffAll()
                         pygame.display.update()
-                        FlashingDot(BRIGHTRED)
+                        FlashDisplay(BRIGHTRED)
+                        drawAllButtonsWithColor(GREEN)
+
+                        # Turn off the Leds
+                        turnOffAll()
+                        pygame.display.update()
+                        FlashDisplay(BRIGHTGREEN)
                         drawAllButtonsWithColor(YELLOW)
+
+                        # Turn on the Leds
+                        turnOffAll()
                         pygame.display.update()
-                        Present()
-                        Candle()
-                        ChasingLights()
+                        index = index + 1
+
+                    # Show some random shapes
+                    RaspberryPi()
+                    Hi()
+                    FlashingDot(BRIGHTYELLOW)
+                    ChristmasTree()
+                    drawAllButtonsWithColor(GREEN)
+                    pygame.display.update()
+                    FlashingDot(BRIGHTGREEN)
+                    Sun()
+                    drawAllButtonsWithColor(RED)
+                    pygame.display.update()
+                    FlashingDot(BRIGHTRED)
+                    drawAllButtonsWithColor(YELLOW)
+                    pygame.display.update()
+                    Present()
+                    Candle()
+                    ChasingLights()
 
                 # Deal with buttons from the matrix pressed
                 else:
@@ -529,12 +526,15 @@ def ChasingLights():
             for columns in range(0,10):
                 if columns >= 0 and columns < 8:
                     drawButtonWithColor(buttons[columns,rows],BRIGHTYELLOW)
+                    turnOnLed(BRIGHTYELLOW,columns,rows)
                     pygame.display.update()
                 if columns > 0 and columns < 9:
                     drawButtonWithColor(buttons[columns - 1,rows],BRIGHTGREEN)
+                    turnOnLed(BRIGHTGREEN,columns,rows)
                     pygame.display.update()
                 if columns > 1:
                     drawButtonWithColor(buttons[columns - 2,rows],BRIGHTRED)
+                    turnOnLed(BRIGHTRED,columns,rows)
                     pygame.display.update()
         else:
             for columns in range(8,-3, -1):
@@ -606,7 +606,7 @@ def FlashDisplay(color):
     turnOnAll(color)
     pygame.time.wait(500)
     
-def FlashingDot(color,animationSpeed = 50):
+def FlashingDot(color,animationSpeed = 100):
     for rows in range(0,8):
         for columns in range(0,8):
             flashColor = color
@@ -624,8 +624,9 @@ def FlashingDot(color,animationSpeed = 50):
                     pygame.display.update()
                     FPSCLOCK.tick(FPS)
                     ######
-                    turnOnLed(color,rows,columns)
+                    turnOnLed(color,columns,rows)
                     ######
+            turnOffAll()
             DISPLAYSURF.blit(origSurf, (0, 0))
 
 def arraysAdd(button):
@@ -653,13 +654,13 @@ def initialise():
 
 def turnOnLed(color,row,column):
     # Turn on individual LED with a specific color - green,red ot yellow
-    if color == RED:
+    if color == BRIGHTRED:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,0xFF)
-    elif color == GREEN:
+    elif color == BRIGHTGREEN:
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
         bus.write_byte_data(ADDRC,PORTB,0xFF)
-    elif color == YELLOW:
+    elif color == BRIGHTYELLOW:
         bus.write_byte_data(ADDRC,PORTB,~(1<<column))
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
     bus.write_byte_data(ADDRR,PORTA,1<<row)
