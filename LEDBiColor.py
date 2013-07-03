@@ -20,7 +20,7 @@ PORTB = 0x13   # PortB data register
 RED = 1
 GREEN = 2
 YELLOW = 3
-ledColor = RED
+ledColor = 1
 def initialise():
     # Set all 16 pins to be output
     bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
@@ -119,30 +119,32 @@ def turnOnLeds(color,row,column):
         bus.write_byte_data(ADDRC,PORTA,~column)
     bus.write_byte_data(ADDRR,PORTA,1<<row)
 
-def multiplexing(patternGreen,patternRed, count):
+def multiplexing(patternGreen,patternRed,patternYellow,count):
     for count in range(0,count):
         for row in range(0,8):
             turnOnLeds(GREEN,row,patternGreen[row])
             turnOnLeds(RED,row,patternRed[row])
+            turnOnLeds(YELLOW,row,patternYellow[row])
+            #time.sleep(0.01)
+            #turnOffAll()
 
 def multiplexingText(color,pattern,count):
     if color == RED:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(RED,row,pattern[row])
-                time.sleep(0.0001)
-    if color == GREEN:
+                time.sleep(0.0005)
+    elif color == GREEN:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(GREEN,row,pattern[row])
-                time.sleep(0.0001)
-    if color == YELLOW:
+                time.sleep(0.0005)
+    elif color == YELLOW:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(YELLOW,row,pattern[row])
-                time.sleep(0.0001)
-
-
+                time.sleep(0.0005)
+                
 def displayText():
     color = raw_input("Choose the color of your text - green,red or yellow")
     text = raw_input("Enter some text to display:")
@@ -173,13 +175,22 @@ def textScroll(ledColor,text):
 
 
 
+
 bus = smbus.SMBus(1)
 initialise()
 
-turnOnAll(YELLOW)
-time.sleep(1)
-turnOffAll()
-time.sleep(0.5)
+
+number = 0
+while (number < 10):
+    for index in range(0,8):
+        turnOnLed(RED,0,index)
+        time.sleep(0.05)
+    for index in range(8,-1,-1):
+        turnOnLed(RED,0,index)
+        time.sleep(0.05)
+    number = number + 1
+
+
 turnOnAll(RED)
 time.sleep(0.3)
 turnOffAll()
@@ -239,18 +250,29 @@ turnOnLed(GREEN,2,2)
 time.sleep(1)
 turnOffAll()
 
-'''
+    
+
+
+
 patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternRed = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
-multiplexing(patternGreen,patternRed,500)
+patternYellow = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+multiplexing(patternGreen,patternRed,patternYellow,100)
+
+patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternYellow = [0x00,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00]
+multiplexing(patternGreen,patternRed,patternYellow,100)
 
 if len(sys.argv) > 2:
    ledColor = sys.argv[1]
    text = sys.argv[2]
 else:
+    print "Choose text color: 1 for red, 2 for green, 3 for yellow"
+    ledColor = sys.stdin.read() 
     print "Enter text to display and then press (Ctrl-D)."
     text = sys.stdin.read()
 
-textScroll(ledColor,text)
+textScroll(int(ledColor),text)
 print "Finished"
-'''
+
