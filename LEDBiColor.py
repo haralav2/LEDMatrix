@@ -7,6 +7,10 @@ import smbus
 import time
 import sys
 import font8x8
+import cProfile, pstats, io
+
+
+pr = cProfile.Profile()
 
 
 # Definitions for the MCP23017
@@ -120,13 +124,17 @@ def turnOnLeds(color,row,column):
     bus.write_byte_data(ADDRR,PORTA,1<<row)
 
 def multiplexing(patternGreen,patternRed,patternYellow,count):
+    pr.enable()
     for count in range(0,count):
         for row in range(0,8):
             turnOnLeds(GREEN,row,patternGreen[row])
             turnOnLeds(RED,row,patternRed[row])
             turnOnLeds(YELLOW,row,patternYellow[row])
-            #time.sleep(0.01)
+            time.sleep(0.001)
             #turnOffAll()
+    pr.disable()
+    #s = io.StringIO()
+    pstats.Stats(pr).print_stats()
 
 def multiplexingText(color,pattern,count):
     if color == RED:
@@ -250,19 +258,15 @@ turnOnLed(GREEN,2,2)
 time.sleep(1)
 turnOffAll()
 
-    
-
-
-
 patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
-patternRed = [0xFD,0xEF,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0x00,0x00,0xEF,0x00,0x00,0x00,0x00,0x00]
 patternYellow = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
-multiplexing(patternGreen,patternRed,patternYellow,100)
+multiplexing(patternGreen,patternRed,patternYellow,20)
 
 patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternYellow = [0x00,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00]
-multiplexing(patternGreen,patternRed,patternYellow,100)
+multiplexing(patternGreen,patternRed,patternYellow,20)
 
 if len(sys.argv) > 2:
    ledColor = sys.argv[1]
