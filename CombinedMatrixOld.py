@@ -111,9 +111,9 @@ def main():
     infoRect.topleft = (10, WINDOWHEIGHT - 20)
 
     DRAW_SURF, DRAW_BUTTON = makeText('DRAW', TEXTCOLOR, BLUE, XMARGIN + 0 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
-    COLOR_SURF, COLOR_BUTTON = makeText('COLOUR', TEXTCOLOR, COLORColor, XMARGIN + 2 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
-    SEE_SURF, SEE_BUTTON = makeText('SEE', TEXTCOLOR, SEEColor, XMARGIN + 4.3 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
-    DEMO_SURF, DEMO_BUTTON = makeText('DEMO', TEXTCOLOR, PURPLE, XMARGIN + 5.5 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
+    COLOR_SURF, COLOR_BUTTON = makeText('COLOUR', TEXTCOLOR, COLORColor, XMARGIN + 2.1 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
+    SEE_SURF, SEE_BUTTON = makeText('SEE', TEXTCOLOR, SEEColor, XMARGIN +4.8 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
+    DEMO_SURF, DEMO_BUTTON = makeText('DEMO', TEXTCOLOR, PURPLE, XMARGIN + 6.45 * (BUTTONSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (BUTTONSIZE + BUTTONGAPSIZE))
 
     # Initialize some variables for a new game
     pattern = [] # stores the pattern of LEDs clicked
@@ -189,9 +189,6 @@ def main():
                         pygame.time.wait(FLASHDELAY)
                     multiplexing(greenArray,redArray,yellowArray,500)
                     turnOffAll()
-                    
-                    #LightPattern()
-                    pygame.time.wait(5000)
                     pattern = []
                     yellowArray = [0,0,0,0,0,0,0,0]
                     greenArray = [0,0,0,0,0,0,0,0]
@@ -231,6 +228,9 @@ def main():
                     Hi()
                     FlashingDot(BRIGHTYELLOW)
                     ChristmasTree()
+                    yellowArray = [0,0,0,0,0,0,0,0]
+                    greenArray = [0,0,0,0,0,0,0,0]
+                    redArray = [0,0,0,0,0,0,0,0]
                     drawAllButtonsWithColor(GREEN)
                     pygame.display.update()
                     FlashingDot(BRIGHTGREEN)
@@ -249,7 +249,7 @@ def main():
                     if drawOnBoard:
                         if clickedButton in pattern:
                             pattern.remove(clickedButton)
-                            arraysAdd(clickedButton)
+                            arraysRemove(clickedButton)
                         else:
                             pattern.append(clickedButton)
                             arraysAdd(clickedButton)
@@ -258,7 +258,10 @@ def main():
             elif event.type == MOUSEBUTTONUP and event.button == 3:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
+                previousColor = getButtonColor(clickedButton)
                 changeButtonColor(clickedButton)
+                if clickedButton in pattern:
+                    arrayChangeColor(clickedButton,previousColor)
                 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -455,8 +458,7 @@ def changeButtonColor(button):
                     buttonsColor[rows,columns] = YELLOW
                 
         
-     
-
+    
 def ChristmasTree():
     tree = (buttons[4,0], buttons[3,1], buttons[4,1], buttons[5,1], buttons[2,2], buttons[3,2], buttons[4,2], buttons[5,2], buttons[6,2], buttons[2,3],
             buttons[3,3], buttons[4,3], buttons[5,3], buttons[6,3], buttons[1,4], buttons[2,4], buttons[3,4], buttons[4,4], buttons[5,4], buttons[6,4],
@@ -480,6 +482,8 @@ def ChristmasTree():
         drawButtonWithColor(button,getButtonColor(button))
     pygame.time.wait(500)
 
+    
+    
 
 def Sun():
     sun = (buttons[3,2], buttons[4,2], buttons[2,3], buttons[3,3], buttons[4,3], buttons[5,3], buttons[2,4], buttons[3,4],
@@ -660,7 +664,38 @@ def arraysAddColor(button,color):
             redArray[row] = redArray[row] | temp
         elif color == GREEN or color == BRIGHTGREEN:
             greenArray[row] = greenArray[row] | temp
-        
+
+def arraysRemove(button):
+    if button != None:
+        color = getButtonColor(button)
+        row = getButtonColumn(button)
+        column = getButtonRow(button)
+        temp = 1<<column
+        if color == YELLOW or color == BRIGHTYELLOW:
+            yellowArray[row] = yellowArray[row] ^ temp
+        elif color == RED or color == BRIGHTRED:
+            redArray[row] = redArray[row] ^ temp
+        elif color == GREEN or color == BRIGHTGREEN:
+            greenArray[row] = greenArray[row] ^ temp
+
+def arraysRemoveColor(button,color):
+    if button != None:
+        row = getButtonColumn(button)
+        column = getButtonRow(button)
+        temp = 1<<column
+        if color == YELLOW or color == BRIGHTYELLOW:
+            yellowArray[row] = yellowArray[row] ^ temp
+        elif color == RED or color == BRIGHTRED:
+            redArray[row] = redArray[row] ^ temp
+        elif color == GREEN or color == BRIGHTGREEN:
+            greenArray[row] = greenArray[row] ^ temp
+
+
+def arrayChangeColor(button,previousColor):
+    if button != None:
+        newColor = getButtonColor(button)
+        arraysAddColor(button,newColor)
+        arraysRemoveColor(button,previousColor)
                       
             
 ##########################################################
@@ -687,42 +722,6 @@ def turnOnLed(color,row,column):
         bus.write_byte_data(ADDRC,PORTA,~(1<<column))
     bus.write_byte_data(ADDRR,PORTA,1<<row)
 
-def LightPattern():
-    rowSum = 0
-    columnSum = 0
-    for row in yellowRow:
-        rowSum = rowSum | row
-    for column in yellowColumn:
-        columnSum = columnSum | column
-    bus.write_byte_data(ADDRC,PORTB,columnSum)
-    bus.write_byte_data(ADDRC,PORTA,columnSum)
-    bus.write_byte_data(ADDRR,PORTA,~rowSum)
-
-    rowSum = 0
-    columnSum = 0
-    for index in range (0,len(redRow)):
-        for index in range (0,len(redColumn)):
-            columnSum = columnSum | redColumn[index]
-        bus.write_byte_data(ADDRC,PORTB,columnSum)
-        bus.write_byte_data(ADDRR,PORTB,~redRow[index])
-        time.sleep(0.1)
-        bus.write_byte_data(ADDRC,PORTB,0x00)
-        bus.write_byte_data(ADDRR,PORTB,0x00)
-        #rowSum = rowSum | redRow[index]
-        #columnSum = columnSum | redColumn[index]
-        #bus.write_byte_data(ADDRC,PORTB,columnSum)
-        #bus.write_byte_data(ADDRR,PORTB,~rowSum)
-        #time.sleep(0.1)
-
-    rowSum = 0
-    columnSum = 0
-    for row in greenRow:
-        rowSum |= row
-    for column in greenColumn:
-        columnSum |= column
-    bus.write_byte_data(ADDRC,PORTA,columnSum)
-    bus.write_byte_data(ADDRR,PORTA,~rowSum)
-
 def turnOnAll(color):
     # Turn on all LEDs
     if color == BRIGHTRED:
@@ -745,9 +744,13 @@ def turnOffAll():
 def multiplexing(patternGreen,patternRed,patternYellow,count):
     for count in range(0,count):
         for row in range(0,8):
-            turnOnLeds(GREEN,row,patternGreen[row])
-            turnOnLeds(RED,row,patternRed[row])
-            turnOnLeds(YELLOW,row,patternYellow[row])
+            bus.write_byte_data(ADDRR,PORTA,0x00)
+            greenOrYellow = patternGreen[row]|patternYellow[row]
+            bus.write_byte_data(ADDRC,PORTA,~greenOrYellow)
+            redOrYellow = patternRed[row]|patternYellow[row]
+            bus.write_byte_data(ADDRC,PORTB,~redOrYellow)
+            bus.write_byte_data(ADDRR,PORTA,1<<row)
+            time.sleep(0.0012)
 
 def turnOnLeds(color,row,column):
     # Turn on individual LED with a specific color - green,red or yellow
