@@ -7,6 +7,7 @@ import smbus
 from struct import unpack
 import numpy as np
 import wave
+import time
 
 bus=smbus.SMBus(1)    #Use '1' for newer Pi boards;
 
@@ -28,13 +29,13 @@ bus.write_byte_data(ADDRC,DIRB,0x00)   # All outputs on PortB address 0x21 - red
 
 def TurnOffLEDS ():
    bus.write_byte_data(ADDRC,PORTA,0x00)
-   bus.write_byte_data(ADDRR,PORTB,0x00)
+   bus.write_byte_data(ADDRC,PORTB,0x00)
+   bus.write_byte_data(ADDRR,PORTA,0x00)
 
 def Set_Column(row, col):
-   bus.write_byte_data(ADDRR,PORTB,row)
-   bus.write_byte_data(ADDRC,PORTA, col)
-   #bus.write_byte_data(ADDR, PORTA, col)
-   #bus.write_byte_data(ADDR, PORTB, row)
+   bus.write_byte_data(ADDRR,PORTA,row)
+   bus.write_byte_data(ADDRC,PORTA,0xFF)
+   bus.write_byte_data(ADDRC,PORTB,col)
    
 # Initialise matrix
 TurnOffLEDS()
@@ -43,7 +44,7 @@ power     = []
 weighting = [2,2,8,8,16,32,64,64] # Change these according to taste
 
 # Set up audio
-wavfile = wave.open('/home/pi/test3.wav','r')
+wavfile = wave.open('/home/pi/Beethoven_Symphony_n.wav','r')
 sample_rate = wavfile.getframerate()
 no_channels = wavfile.getnchannels()
 chunk       = 4096 # Use a multiple of 8
@@ -90,5 +91,6 @@ while data!='':
     matrix=calculate_levels(data, chunk,sample_rate)
     for i in range (0,8):
         Set_Column((1<<matrix[i])-1,0xFF^(1<<i))
+        #time.sleep(0.0002)
     data = wavfile.readframes(chunk)
     TurnOffLEDS()
