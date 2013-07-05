@@ -137,21 +137,32 @@ def multiplexing(patternGreen,patternRed,patternYellow,count):
     pstats.Stats(pr).print_stats()
 
 def multiplexingText(color,pattern,count):
-    if color == RED:
-        for count in range(0,count):
-            for row in range(0,8):
-                turnOnLeds(RED,row,pattern[row])
-                time.sleep(0.0005)
-    elif color == GREEN:
+    if color == GREEN:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(GREEN,row,pattern[row])
-                time.sleep(0.0005)
+                time.sleep(0.0003)
     elif color == YELLOW:
         for count in range(0,count):
             for row in range(0,8):
                 turnOnLeds(YELLOW,row,pattern[row])
-                time.sleep(0.0005)
+                time.sleep(0.0003)
+    else:
+        for count in range(0,count):
+            for row in range(0,8):
+                turnOnLeds(RED,row,pattern[row])
+                time.sleep(0.0003)
+
+def fastMultiplexing(patternGreen,patternRed,patternYellow,count):
+    for count in range(0,count):
+        for row in range(0,8):
+            bus.write_byte_data(ADDRR,PORTA,0x00)
+            greenOrYellow = patternGreen[row]|patternYellow[row]
+            bus.write_byte_data(ADDRC,PORTA,~greenOrYellow)
+            redOrYellow = patternRed[row]|patternYellow[row]
+            bus.write_byte_data(ADDRC,PORTB,~redOrYellow)
+            bus.write_byte_data(ADDRR,PORTA,1<<row)
+            time.sleep(0.0012)
                 
 def displayText():
     color = raw_input("Choose the color of your text - green,red or yellow")
@@ -198,6 +209,18 @@ while (number < 10):
         time.sleep(0.05)
     number = number + 1
 
+patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0x00,0x00,0xEF,0x00,0x00,0x00,0x00,0x00]
+patternYellow = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+fastMultiplexing(patternGreen,patternRed,patternYellow,500)
+
+patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+patternYellow = [0x00,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00]
+fastMultiplexing(patternGreen,patternRed,patternYellow,500)
+
+turnOffAll()
+time.sleep(2)
 
 turnOnAll(RED)
 time.sleep(0.3)
@@ -254,19 +277,15 @@ for row in range(0,8):
         time.sleep(0.1)
 turnOffAll()
 
-turnOnLed(GREEN,2,2)
-time.sleep(1)
-turnOffAll()
-
 patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternRed = [0x00,0x00,0xEF,0x00,0x00,0x00,0x00,0x00]
 patternYellow = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
-multiplexing(patternGreen,patternRed,patternYellow,20)
+fastMultiplexing(patternGreen,patternRed,patternYellow,50)
 
 patternGreen = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternRed = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 patternYellow = [0x00,0x00,0x18,0x3C,0x3C,0x18,0x00,0x00]
-multiplexing(patternGreen,patternRed,patternYellow,20)
+fastMultiplexing(patternGreen,patternRed,patternYellow,50)
 
 if len(sys.argv) > 2:
    ledColor = sys.argv[1]
