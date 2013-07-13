@@ -66,21 +66,7 @@ bgColor = BLACK
 # The color of the text in the buttons
 TEXTCOLOR = WHITE
 
-
-LEDCurrentColor = GREEN
-
-LEDCurrentFlashColor = BRIGHTGREEN
-
 LEDInitialColor = DARKGRAY
-
-# The initial flashing color for the LED
-LEDFlashColor = BRIGHTYELLOW
-
-# The SEE button flash color
-SEEFlashColor = BRIGHTGREEN
-
-# The COLOR button flash color
-COLORFlashColor = BRIGHTRED
 
 XMARGIN = int((WINDOWWIDTH - (LEDSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2 + 60)
 YMARGIN = int((WINDOWHEIGHT - (LEDSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
@@ -92,9 +78,7 @@ for rows in range(0,8):
         buttons[rows,columns] = pygame.Rect(XMARGIN + rows * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + columns * (LEDSIZE + BUTTONGAPSIZE),LEDSIZE, LEDSIZE)
 
 # Numpy array, which stores all the colors of the corresponding buttons 
-buttonsColor = np.empty((8,8), dtype=object)
-
-# I2C bus that controls the LED matrix
+buttonsColor = np.empty((8,8), dtype=object)# I2C bus that controls the LED matrix
 bus = smbus.SMBus(1)
 
 # For the LED matrix - we need 6 arrays - 3 for rows and 3 for columns,where we will store the corresponding addresses
@@ -104,7 +88,7 @@ redArray = [0,0,0,0,0,0,0,0]
     
 # Main method
 def main():
-    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColor, LEDCurrentColor, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, normalMode, yellowMode, redMode, LEDFlashColor, DEMO_SURF, DEMO_BUTTON
+    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColor, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, normalMode, yellowMode, redMode, DEMO_SURF, DEMO_BUTTON
 
     # Initialising the game state
     pygame.init()
@@ -215,7 +199,6 @@ def main():
                             drawButtonWithColor(button, getButtonColor(button))
                         flashButtonAnimationBig(clickedButton)
                         for button in pattern:
-                            #flashButtonAnimation(button)
                             flashColor(button)
                             if button != None:
                                 turnOnLed(getFlashColor(button),getButtonColumn(button),getButtonRow(button))
@@ -398,27 +381,6 @@ def playSoundForButton(col):
     
 
 
-# Flash the matrix buttons
-def flashButtonAnimation(color, animationSpeed=50):
-    for rows in range(0,8):
-        for columns in range(0,8):
-            if color == buttons[rows,columns]:
-                flashColor = BRIGHTYELLOW
-                rectangle = buttons[rows,columns]
-                origSurf = DISPLAYSURF.copy()
-                flashSurf = pygame.Surface((LEDSIZE, LEDSIZE))
-                flashSurf = flashSurf.convert_alpha()
-                r, g, b = flashColor
-                for start, end, step in ((0, 255, 1), (255, 0, -1)): # animation loop
-                    for alpha in range(start, end, animationSpeed * step):
-                        checkForQuit()
-                        DISPLAYSURF.blit(origSurf, (0, 0))
-                        flashSurf.fill((r, g, b, alpha))
-                        DISPLAYSURF.blit(flashSurf, rectangle.topleft)
-                        pygame.display.update()
-                        FPSCLOCK.tick(FPS)
-                DISPLAYSURF.blit(origSurf, (0, 0))
-
 # Draw the buttons all with the same background color
 def initialColor(array):
     for rows in range(0,8):
@@ -511,14 +473,21 @@ def drawButtonWithColor(button, color):
     DISPLAYSURF.blit(RED_SURF, RED_BUTTON)
     DISPLAYSURF.blit(NONE_SURF, NONE_BUTTON)
     
+def drawAllButtonsWithColor(color):
+    for rows in range(0,8):
+            for columns in range(0,8):
+                drawButtonWithColor(buttons[rows,columns], color)
+
+def drawAllButtons():
+    for rows in range(0,8):
+            for columns in range(0,8):
+                drawButtonWithColor(buttons[rows,columns], buttonsColor[rows,columns])
                 
 def getButtonClicked(x, y):
     for rows in range(0,8):
         for columns in range(0,8):
             if buttons[rows,columns].collidepoint( (x,y) ):
                 return buttons[rows,columns]
-    #if DRAW_BUTTON.collidepoint( (x, y) ):
-     #   return BLUE
     if RED_BUTTON.collidepoint( (x, y) ):
         return RED
     elif GREEN_BUTTON.collidepoint( (x, y) ):
@@ -610,7 +579,7 @@ def changeButtonColor(button,array):
                     arraysRemove(button)
                         
                     
-
+####################################################### Demo ########################################################################################
         
     
 def ChristmasTree():
@@ -682,9 +651,6 @@ def Candle():
     multiplexing(greenArray,redArray,yellowArray,500)
     
 
-
-
-
 def ChasingLights():
     for rows in range(0,8):
         if rows % 2 == 0:
@@ -716,8 +682,7 @@ def ChasingLights():
                     turnOnLed(BRIGHTRED,rows,columns + 2)
                     pygame.display.update()
 
-                
-
+            
 
 def RaspberryPi():
     drawButtonWithColor(buttons[3,3],BRIGHTRED)
@@ -766,18 +731,6 @@ def Hi():
     multiplexing(greenArray,redArray,yellowArray,500)
 
 
-    
-
-def drawAllButtonsWithColor(color):
-    for rows in range(0,8):
-            for columns in range(0,8):
-                drawButtonWithColor(buttons[rows,columns], color)
-
-def drawAllButtons():
-    for rows in range(0,8):
-            for columns in range(0,8):
-                drawButtonWithColor(buttons[rows,columns], buttonsColor[rows,columns])
-
 def FlashDisplay(color):
     drawAllButtonsWithColor(color)
     pygame.display.update()
@@ -804,6 +757,8 @@ def FlashingDot(color,animationSpeed = 100):
                     turnOnLed(color,columns,rows)
             turnOffAll()
             DISPLAYSURF.blit(origSurf, (0, 0))
+            
+########## Dealing With Arrays and Multiplexing ######################## 
 
 def arraysAdd(button):
     if button != None:
@@ -863,7 +818,7 @@ def arrayChangeColor(button,previousColor):
         arraysRemoveColor(button,previousColor)
                       
             
-##########################################################
+################### Actual Matrix Visualisation ###############
 def initialise():
     # Set all 16 pins to be output
     bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
