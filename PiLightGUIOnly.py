@@ -189,7 +189,8 @@ def main():
                     stateOfSelection = NONEMODE
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
-                    previousSelection = stateOfSelection
+                    if stateOfSelection == NONEMODE:
+                        stateOfSelection = previousSelection
                     pattern = []
                     initialColour(pattern)
                     yellowArray = [0,0,0,0,0,0,0,0]
@@ -563,9 +564,6 @@ def changeButtonColour(button,array):
                     if button in array:
                         array.remove(button)
                         arraysRemove(button)
-                    global stateOfSelection
-                    global previousSelection
-                    stateOfSelection = previousSelection
                             
                         
                     
