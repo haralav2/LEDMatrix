@@ -94,7 +94,7 @@ buttonsColour = np.empty((8,8), dtype=object)
     
 # Main method
 def main():
-    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, DEMO_SURF, DEMO_BUTTON
+    global FPSCLOCK, GREENMODE, REDMODE, YELLOWMODE, NONEMODE, stateOfSelection, previousSelection, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, DEMO_SURF, DEMO_BUTTON
 
     # I2C bus that controls the LED matrix
     bus = smbus.SMBus(1)
@@ -155,19 +155,17 @@ def main():
             
     # When false it indicates that the player cannot click on the gray buttons
     drawOnBoard = True
-    global GREENMODE
+
     GREENMODE = 1
-    global REDMODE
+
     REDMODE = 2
-    global YELLOWMODE
+
     YELLOWMODE = 3
-    global NONEMODE
+
     NONEMODE = 4
-    global CLEARMODE
-    CLEARMODE = 5
-    global stateOfSelection
+
     stateOfSelection = GREENMODE
-    global previousSelection
+
     previousSelection = 0
     while True: # main game loop
 
@@ -208,7 +206,8 @@ def main():
                     stateOfSelection = NONEMODE
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
-                    previousSelection = stateOfSelection
+                    if stateOfSelection == NONEMODE:
+                        stateOfSelection = previousSelection
                     pattern = []
                     initialColour(pattern)
                     yellowArray = [0,0,0,0,0,0,0,0]
@@ -604,9 +603,6 @@ def changeButtonColour(button,array):
                     if button in array:
                         array.remove(button)
                         arraysRemove(button)
-                    global stateOfSelection
-                    global previousSelection
-                    stateOfSelection = previousSelection
                             
                         
                     
