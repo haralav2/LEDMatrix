@@ -8,8 +8,8 @@ from struct import unpack
 import numpy as np
 import wave
 import time
-
-bus=smbus.SMBus(1)    #Use '1' for newer Pi boards;
+import Bicolour_Interface
+bus=smbus.SMBus(1)
 
 # Definitions for the MCP23017
 ADDRR = 0x20   # I2C bus address of the 23017 Rows
@@ -27,97 +27,77 @@ bus.write_byte_data(ADDRC,DIRA,0x00)   # All outputs on PortA address 0x21 - gre
 bus.write_byte_data(ADDRC,DIRB,0x00)   # All outputs on PortB address 0x21 - red
 
 
-def TurnOffLEDS ():
-   bus.write_byte_data(ADDRC,PORTA,0x00)
-   bus.write_byte_data(ADDRC,PORTB,0x00)
-   bus.write_byte_data(ADDRR,PORTA,0x00)
 
-def Set_ColumnRed(row, col):
-   bus.write_byte_data(ADDRR,PORTA,row)
-   bus.write_byte_data(ADDRC,PORTA,0xFF)
-   bus.write_byte_data(ADDRC,PORTB,col)
-
-def Set_ColumnGreen(row,col):
-   bus.write_byte_data(ADDRR,PORTA,row)
-   bus.write_byte_data(ADDRC,PORTB,0xFF)
-   bus.write_byte_data(ADDRC,PORTA,col)
-
-def Set_ColumnYellow(row,col):
-   bus.write_byte_data(ADDRR,PORTA,row)
-   bus.write_byte_data(ADDRC,PORTB,row)
-   bus.write_byte_data(ADDRC,PORTA,col)
-   
 # Initialise matrix
-TurnOffLEDS()
+Bicolour_Interface.initialise()
 matrix    = [0,0,0,0,0,0,0,0]
-power     = []
-weighting = [16,16,16,16,32,64,64,64]
-#weighting = [2,2,8,8,16,32,64,64] # Change these according to taste
+frequencyRange     = []
+scaling = [2,2,2,2,2,2,2,2]
 
 # Set up audio
+#wavfile = wave.open('/home/pi/BassCannon0.wav','r')
 wavfile = wave.open('/home/pi/Beethoven_Symphony_n.wav','r')
-sample_rate = wavfile.getframerate()
-no_channels = wavfile.getnchannels()
-chunk       = 2048 # Use a multiple of 8
+#wavfile = wave.open('/home/pi/440hzAtone.wav','r')
+sampleRate = wavfile.getframerate()
+frameSize       = 2048
 output = aa.PCM(aa.PCM_PLAYBACK, aa.PCM_NORMAL)
-output.setchannels(no_channels)
-output.setrate(sample_rate)
+output.setchannels(wavfile.getnchannels())
+output.setrate(sampleRate)
 output.setformat(aa.PCM_FORMAT_S16_LE)
-output.setperiodsize(chunk)
+output.setperiodsize(frameSize)
 
-# Return power array index corresponding to a particular frequency
-def piff(val):
-   return int(2*chunk*val/sample_rate)
+binWidth = frameSize / 8
 
-power156 = 2*chunk*156/sample_rate
-power313 = 2*chunk*313/sample_rate
-power625 = 2*chunk*625/sample_rate
-power1250 = 2*chunk*1250/sample_rate
-power2500 = 2*chunk*2500/sample_rate
-power5000 = 2*chunk*5000/sample_rate
-power10000 = 2*chunk*10000/sample_rate
-power20000 = 2*chunk*20000/sample_rate
-
-def calculate_levels(data):
+def calculateColumns(data):
    global matrix
    # Convert raw data (ASCII string) to numpy array
    data = unpack("%dh"%(len(data)/2),data)
    data = np.array(data, dtype='h')
-   # Apply FFT - real data
-   power=np.abs(np.fft.rfft(data))
-   # Remove last element in array to make it the same size as chunk
-   power=np.delete(power,len(power)-1)
+   
+   # Use the fast fourier transform to convert a wave from the time domain
+   # to the frequency domain
+   realFourier = np.fft.rfft(data)
+   
+   # With the absolute function only postive values remain   
+   # 0.01 is added to deal with the case when a frequency range is not present
+   # Keeps from log10(0) to throw an error later on 
+   frequencyRange = np.log10(np.add(np.abs(realFourier),0.01))**2
+   
+   # Remove last element in array to make it the same size as frameSize
+   frequencyRange=np.delete(frequencyRange,len(frequencyRange)-1)
+   
    # Find average 'amplitude' for specific frequency ranges in Hz
-   matrix[0]= int(np.mean(power[0          :power156]))
-   matrix[1]= int(np.mean(power[power156   :power313]))
-   matrix[2]= int(np.mean(power[power313   :power625]))
-   matrix[3]= int(np.mean(power[power625   :power1250]))
-   matrix[4]= int(np.mean(power[power1250  :power2500]))
-   matrix[5]= int(np.mean(power[power2500  :power5000]))
-   matrix[6]= int(np.mean(power[power5000  :power10000]))
-   matrix[7]= int(np.mean(power[power10000 :power20000]))
+   matrix[0]= int(np.mean(frequencyRange[0                         :(frameSize - 7*binWidth)]))
+   matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)  :(frameSize - 6*binWidth)]))
+   matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)  :(frameSize - 5*binWidth)]))
+   matrix[3]= int(np.mean(frequencyRange[(frameSize - 5*binWidth)  :(frameSize - 4*binWidth)]))
+   matrix[4]= int(np.mean(frequencyRange[(frameSize - 4*binWidth)  :(frameSize - 3*binWidth)]))
+   matrix[5]= int(np.mean(frequencyRange[(frameSize - 3*binWidth)  :(frameSize - 2*binWidth)]))
+   matrix[6]= int(np.mean(frequencyRange[(frameSize - 2*binWidth)  :(frameSize - binWidth)]))
+   matrix[7]= int(np.mean(frequencyRange[(frameSize - binWidth)    :frameSize]))
+    
    # Tidy up column values for the LED matrix
-   matrix=np.divide(np.multiply(matrix,weighting),1000000)
-   print matrix
-   # Set floor at 0 and ceiling at 8 for LED matrix
-   matrix=np.divide(matrix,3)
+   matrix=np.divide(np.multiply(matrix,2),5)
+
+   # Make sure all values are between 0 and 8 
    matrix=matrix.clip(0,8)
-   #print matrix
    return matrix
 
 
 print "Processing....."
-data = wavfile.readframes(chunk)
-while data!='':
-    output.write(data)
-    matrix=calculate_levels(data)
-    for i in range (0,8):
-      if (i<=2):
-         Set_ColumnGreen((1<<matrix[i])-1,~(1<<i))
-      elif (i>2 and i<=4):
-         Set_ColumnYellow((1<<matrix[i])-1,~(1<<i))
-      else:
-         Set_ColumnRed((1<<matrix[i])-1,~(1<<i))
-    time.sleep(0.5)
-    data = wavfile.readframes(chunk)
-    #TurnOffLEDS()
+data = wavfile.readframes(frameSize)
+while len(data) != 0:
+   if len(data) == 4*frameSize:
+       output.write(data)
+       matrix=calculateColumns(data)
+       for i in range (0,8):
+         if (i<=2):
+            Bicolour_Interface.setColumnGreen((1<<matrix[i])-1,~(1<<i))
+         elif (i>2 and i<=5):
+            Bicolour_Interface.setColumnYellow((1<<matrix[i])-1,~(1<<i))
+         else:
+            Bicolour_Interface.setColumnRed((1<<matrix[i])-1,~(1<<i))
+         Bicolour_Interface.turnOffAllAudio()
+       Bicolour_Interface.turnOffAllAudio()
+   data = wavfile.readframes(frameSize)
+output.close()
