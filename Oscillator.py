@@ -42,7 +42,11 @@ def generateSineWave(increment, waveTable, soundLength = 20, amplitude=1, sampli
     # look-up table
     index = 0
     while (index != int(len(waveTable) / increment)):
-        product[index] = amplitude*waveTable[int(phaseIndex)]
+        if index > int(len(waveTable) / (increment * 2)):
+            product[index] = amplitude*waveTable[int(phaseIndex)]
+        else:
+            product[index] = waveTable[int(phaseIndex)]
+                       
         phaseIndex = (previousPhase + increment) % len(waveTable)
         previousPhase = phaseIndex
         index += 1
@@ -54,10 +58,12 @@ def generateSineWave(increment, waveTable, soundLength = 20, amplitude=1, sampli
         indexing = len(waveTable)*soundLength - len(newProduct)
         newProduct = np.hstack((newProduct,product[0:indexing]))
     return newProduct
+
+
     
 waveTable = generateLookUpTable(4096)
 pr.enable()
-tone = generateSineWave(20, waveTable)
+tone = generateSineWave(20, waveTable,amplitude=5)
 pr.disable()
 s = io.StringIO()
 pstats.Stats(pr).print_stats()
@@ -66,7 +72,7 @@ play(tone)
 pr.disable()
 s = io.StringIO()
 pstats.Stats(pr).print_stats()
-tone1 = generateSineWave(64,waveTable)
+tone1 = generateSineWave(20,waveTable)
 play(tone1)
 harmonic1 = generateSineWave(40.9,waveTable)
 play(harmonic1)
