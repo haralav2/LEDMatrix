@@ -1,5 +1,5 @@
 #############################################   Authors   ###########################################
-###########################                     PiLight                  ############################    ###################
+###########################                     PiLight                  ############################  
 ###########################               Veneta Haralampieva           #############################
 
 
@@ -91,18 +91,19 @@ for rows in range(0,8):
 # Numpy array, which stores all the Colours of the corresponding buttons 
 buttonsColour = np.empty((8,8), dtype=object)
 
-# I2C bus that controls the LED matrix
-bus = smbus.SMBus(1)
-
-# For the LED matrix - we need 3 arrays - one for each colour, where we will keep what values need to be send to the matrix to lit up a pattern
-yellowArray = [0,0,0,0,0,0,0,0]
-greenArray = [0,0,0,0,0,0,0,0]
-redArray = [0,0,0,0,0,0,0,0]
     
 # Main method
 def main():
-    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, normalMode, yellowMode, redMode, DEMO_SURF, DEMO_BUTTON
+    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, DEMO_SURF, DEMO_BUTTON
 
+    # I2C bus that controls the LED matrix
+    bus = smbus.SMBus(1)
+
+    # For the LED matrix - we need 3 arrays - one for each colour, where we will keep what values need to be send to the matrix to lit up a pattern
+    yellowArray = [0,0,0,0,0,0,0,0]
+    greenArray = [0,0,0,0,0,0,0,0]
+    redArray = [0,0,0,0,0,0,0,0]
+    
     # Initialising the game state
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -154,10 +155,20 @@ def main():
             
     # When false it indicates that the player cannot click on the gray buttons
     drawOnBoard = True
-    normalMode = True
-    redMode = False
-    yellowMode = False
-    
+    global GREENMODE
+    GREENMODE = 1
+    global REDMODE
+    REDMODE = 2
+    global YELLOWMODE
+    YELLOWMODE = 3
+    global NONEMODE
+    NONEMODE = 4
+    global CLEARMODE
+    CLEARMODE = 5
+    global stateOfSelection
+    stateOfSelection = GREENMODE
+    global previousSelection
+    previousSelection = 0
     while True: # main game loop
 
         Bicolour_Interface.turnOffAll()
@@ -184,29 +195,20 @@ def main():
                 clickedButton = getButtonClicked(mousex, mousey)
                 if clickedButton == GREEN:
                     flashButtonAnimationBig(clickedButton)
-                    normalMode = True
-                    redMode = False
-                    yellowMode = False
+                    stateOfSelection = GREENMODE
                 elif clickedButton == YELLOW:
                     flashButtonAnimationBig(clickedButton)
-                    normalMode = False
-                    redMode = False
-                    yellowMode = True
+                    stateOfSelection = YELLOWMODE
                 elif clickedButton == RED:
                     flashButtonAnimationBig(clickedButton)
-                    normalMode = False
-                    redMode = True
-                    yellowMode = False
+                    stateOfSelection = REDMODE
                 elif clickedButton == DARKGRAY:
                     flashButtonAnimationBig(clickedButton)
-                    normalMode = False
-                    redMode = False
-                    yellowMode = False
+                    previousSelection = stateOfSelection
+                    stateOfSelection = NONEMODE
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
-                    normalMode = True
-                    redMode = False
-                    yellowMode = False
+                    previousSelection = stateOfSelection
                     pattern = []
                     initialColour(pattern)
                     yellowArray = [0,0,0,0,0,0,0,0]
@@ -562,46 +564,48 @@ def changeButtonColour(button,array):
     for rows in range(0,8):
         for columns in range(0,8):
             if button == buttons[rows,columns]:
-                if normalMode == True:
+                if stateOfSelection == GREENMODE:
                     if buttonsColour[rows,columns] == DARKGRAY:
                         buttonsColour[rows,columns] = GREEN
+                    elif buttonsColour[rows,columns] == RED:
+                        buttonsColour[rows,columns] = GREEN
+                    elif buttonsColour[rows,columns] == YELLOW:
+                        buttonsColour[rows,columns] = GREEN
                     elif buttonsColour[rows,columns] == GREEN:
-                        buttonsColour[rows,columns] = YELLOW
+                        buttonsColour[rows,columns] = DARKGRAY
+                        array.remove(button)
+                        arraysRemove(button)
+                elif stateOfSelection == REDMODE:
+                    if buttonsColour[rows,columns] == DARKGRAY:
+                        buttonsColour[rows,columns] = RED
+                    elif buttonsColour[rows,columns] == GREEN:
+                        buttonsColour[rows,columns] = RED
                     elif buttonsColour[rows,columns] == YELLOW:
                         buttonsColour[rows,columns] = RED
                     elif buttonsColour[rows,columns] == RED:
                         buttonsColour[rows,columns] = DARKGRAY
                         array.remove(button)
                         arraysRemove(button)
-                elif redMode == True:
-                    if buttonsColour[rows,columns] == DARKGRAY:
-                        buttonsColour[rows,columns] = RED
-                    elif buttonsColour[rows,columns] == GREEN:
-                        buttonsColour[rows,columns] = YELLOW
-                    elif buttonsColour[rows,columns] == YELLOW:
-                        buttonsColour[rows,columns] = DARKGRAY
-                        array.remove(button)
-                        arraysRemove(button)
-                    elif buttonsColour[rows,columns] == RED:
-                        buttonsColour[rows,columns] = GREEN
                         
-                elif yellowMode == True:
+                elif stateOfSelection == YELLOWMODE:
                     if buttonsColour[rows,columns] == DARKGRAY:
                         buttonsColour[rows,columns] = YELLOW
                     elif buttonsColour[rows,columns] == GREEN:
+                        buttonsColour[rows,columns] = YELLOW
+                    elif buttonsColour[rows,columns] == YELLOW:
                         buttonsColour[rows,columns] = DARKGRAY
                         array.remove(button)
                         arraysRemove(button)
-                    elif buttonsColour[rows,columns] == YELLOW:
-                        buttonsColour[rows,columns] = RED
                     elif buttonsColour[rows,columns] == RED:
-                        buttonsColour[rows,columns] = GREEN
-                else:
+                        buttonsColour[rows,columns] = YELLOW
+                elif stateOfSelection == NONEMODE:
                     buttonsColour[rows,columns] = DARKGRAY
                     if button in array:
                         array.remove(button)
                         arraysRemove(button)
-                    
+                    global stateOfSelection
+                    global previousSelection
+                    stateOfSelection = previousSelection
                             
                         
                     
