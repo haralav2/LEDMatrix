@@ -834,16 +834,16 @@ def Hi():
     Bicolour_Interface.multiplexing(greenArray,redArray,yellowArray,500)
 
 
-def FlashDisplay(Colour):
-    drawAllButtonsWithColour(Colour)
+def FlashDisplay(colour):
+    drawAllButtonsWithColour(colour)
     pygame.display.update()
-    Bicolour_Interface.turnOnAll(Colour)
+    Bicolour_Interface.turnOnAll(colour)
     pygame.time.wait(500)
     
-def FlashingDot(Colour,animationSpeed = 100):
+def FlashingDot(colour,animationSpeed = 100):
     for rows in range(0,8):
         for columns in range(0,8):
-            flashColour = Colour
+            flashColour = colour
             rectangle = buttons[rows,columns]
             origSurf = DISPLAYSURF.copy()
             flashSurf = pygame.Surface((LEDSIZE, LEDSIZE))
@@ -857,7 +857,7 @@ def FlashingDot(Colour,animationSpeed = 100):
                     DISPLAYSURF.blit(flashSurf, rectangle.topleft)
                     pygame.display.update()
                     FPSCLOCK.tick(FPS)
-                    Bicolour_Interface.turnOnLed(Colour,columns,rows)
+                    Bicolour_Interface.turnOnLed(colour,columns,rows)
             Bicolour_Interface.turnOffAll()
             DISPLAYSURF.blit(origSurf, (0, 0))
             
