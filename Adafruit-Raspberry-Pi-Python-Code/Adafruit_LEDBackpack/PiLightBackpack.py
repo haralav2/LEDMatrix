@@ -312,9 +312,10 @@ def main():
                             changeButtonColour(clickedButton,pattern)
                             arrayChangeColour(clickedButton,previousColour)
                         else:
-                            changeButtonColour(clickedButton,pattern)
-                            pattern.append(clickedButton)
-                            arraysAdd(clickedButton)
+                            if stateOfSelection != NONEMODE:
+                                changeButtonColour(clickedButton,pattern)
+                                pattern.append(clickedButton)
+                                arraysAdd(clickedButton)
 
                 
         pygame.display.update()
