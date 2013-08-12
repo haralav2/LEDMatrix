@@ -37,9 +37,11 @@ WINDOWWIDTH = 800
 # The height of the window for the game
 WINDOWHEIGHT = 800
 
-FLASHSPEED = 500 # in milliseconds
+# in milliseconds
+FLASHSPEED = 500
 
-FLASHDELAY = 200 # in milliseconds
+# in milliseconds
+FLASHDELAY = 200 
 
 # Size of the buttons that represent the LEDS
 LEDSIZE = 60
@@ -191,19 +193,33 @@ def main():
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
+
+                # If the pressed button was GREEN - allows user to turn on
+                # green LEDs
                 if clickedButton == GREEN:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = GREENMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # yellow LEDs
                 elif clickedButton == YELLOW:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = YELLOWMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # red LEDs
                 elif clickedButton == RED:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = REDMODE
+
+                # If the pressed button was GREEN - allows user to turn off
+                # all coloured LEDs
                 elif clickedButton == DARKGRAY:
                     flashButtonAnimationBig(clickedButton)
                     previousSelection = stateOfSelection
                     stateOfSelection = NONEMODE
+
+                # Clears everything
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
                     if stateOfSelection == NONEMODE:
