@@ -5,7 +5,7 @@ import alsaaudio as aa
 import numpy as np
 import cProfile, pstats, io
 from scikits.audiolab import play
-
+from pylab import plot,show,axis, title, xlabel, ylabel, subplot
 
 pr = cProfile.Profile()
 
@@ -24,9 +24,6 @@ def generateLookUpTable(tableLength):
     
     
 def generateSineWave(increment, waveTable, phaseIndex=0, soundLength=20, amplitude=1, samplingFrequency=44100):
-    # Index that goes through the look-up table
-    #phaseIndex = 0
-
     # The previous index from the look-up table
     previousPhase = phaseIndex
     
@@ -42,11 +39,32 @@ def generateSineWave(increment, waveTable, phaseIndex=0, soundLength=20, amplitu
     # look-up table
     index = 0
     while (index != int(len(waveTable) / increment)):
-        if index > int(len(waveTable) / (increment * 2)):
-            product[index] = amplitude*waveTable[int(phaseIndex)]
-        else:
-            product[index] = waveTable[int(phaseIndex)]
-                       
+        product[index] = amplitude*waveTable[int(phaseIndex)]                       
+        phaseIndex = (previousPhase + increment) % len(waveTable)
+        previousPhase = phaseIndex
+        index += 1
+
+    # Filling the array with a desired amount of samples to ensure length
+    product = np.tile(product,int(increment))
+    newProduct = np.tile(product,soundLength)
+    if (len(newProduct) < (len(waveTable)*soundLength)):
+        indexing = len(waveTable)*soundLength - len(newProduct)
+        newProduct = np.hstack((newProduct,product[0:indexing]))
+    return newProduct
+
+def generateSineWaveFrequency(frequency, waveTable, phaseIndex=0, soundLength=20, amplitude=1, samplingFrequency=44100):
+    # The previous index from the look-up table
+    previousPhase = phaseIndex
+    
+    print frequency    
+    increment = float ((len(waveTable) * frequency)) / float(samplingFrequency)
+    product = np.array([0 for x in range(int(len (waveTable) / increment))],np.float16)
+
+    # Index going through a new array that will contain only some of the samples from the
+    # look-up table
+    index = 0
+    while (index != int(len(waveTable) / increment)):
+        product[index] = amplitude*waveTable[int(phaseIndex)]                 
         phaseIndex = (previousPhase + increment) % len(waveTable)
         previousPhase = phaseIndex
         index += 1
@@ -61,9 +79,6 @@ def generateSineWave(increment, waveTable, phaseIndex=0, soundLength=20, amplitu
 
 
 def generateSineWaveRepeat(increment, waveTable, phaseIndex=0, soundLength=20, amplitude=1, samplingFrequency=44100):
-    # Index that goes through the look-up table
-    #phaseIndex = 0
-
     # The previous index from the look-up table
     previousPhase = phaseIndex
     
@@ -94,54 +109,102 @@ def generateSineWaveRepeat(increment, waveTable, phaseIndex=0, soundLength=20, a
     
 waveTable = generateLookUpTable(4096)
 pr.enable()
-tone = generateSineWave(20, waveTable,amplitude=1.005)
+
+###############  Amplitude distortion  ######################
+tone = generateSineWave(20,waveTable,amplitude=0.7)
 pr.disable()
 s = io.StringIO()
 pstats.Stats(pr).print_stats()
 pr.enable()
 play(tone)
+plot(np.linspace(0, len(tone) / 44100, len(tone)), tone)
+axis([0,0.01,-2,2])
+show()
 pr.disable()
 s = io.StringIO()
 pstats.Stats(pr).print_stats()
+
+#############################################################
+
 tone1 = generateSineWave(20,waveTable)
 play(tone1)
+plot(np.linspace(0, len(tone1) / 44100, len(tone1)), tone1)
+axis([0,0.01,-2,2])
+show()
+
+
+############  Phase distortion  #############################
 tone2 = generateSineWave(20,waveTable,phaseIndex=500)
+plot(np.linspace(0, len(tone2) / 44100, len(tone2)), tone2)
+axis([0,0.01,-2,2])
+show()
 play(tone2)
+#############################################################
+
 tone1diff = generateSineWaveRepeat(20,waveTable)
 play(tone1diff)
 
-
-harmonic1 = generateSineWave(40.9,waveTable)
-play(harmonic1)
-#######################################################################################
+####################  Piano keys  ###########################
 key50 = generateSineWave(43.3,waveTable)
 play(key50)
-key51 = generateSineWave(45.89,waveTable)
+plot(np.linspace(0, len(key50) / 44100, len(key50)), key50)
+axis([0,0.01,-2,2])
+show()
+key51 = generateSineWave(45.89,waveTable,amplitude=0.7)
 play(key51)
-key52 = generateSineWave(48.6,waveTable)
+key52 = generateSineWave(48.6,waveTable,amplitude=0.7)
 play(key52)
-key53 = generateSineWave(51.5,waveTable)
+key53 = generateSineWave(51.5,waveTable,amplitude=0.7)
 play(key53)
-key54 = generateSineWave(54.57,waveTable)
+key54 = generateSineWave(54.57,waveTable,amplitude=0.7)
 play(key54)
-key55 = generateSineWave(57.8,waveTable)
+key55 = generateSineWave(57.8,waveTable,amplitude=0.7)
 play(key55)
-key56 = generateSineWave(61.28,waveTable)
+key56 = generateSineWave(61.28,waveTable,amplitude=0.7)
 play(key56)
-key57 = generateSineWave(64.9,waveTable)
+key57 = generateSineWave(64.9,waveTable,amplitude=0.7)
 play(key57)
-key58 = generateSineWave(68.7,waveTable)
+key58 = generateSineWave(68.7,waveTable,amplitude=0.7)
 play(key58)
-key59 = generateSineWave(72.8,waveTable)
+key59 = generateSineWave(72.8,waveTable,amplitude=0.7)
 play(key59)
-key60 = generateSineWave(77.15,waveTable)
+key60 = generateSineWave(77.15,waveTable,amplitude=0.7)
 play(key60)
-#######################################################################################
+plot(np.linspace(0, len(key60) / 44100, len(key60)), key60)
+axis([0,0.01,-2,2])
+show()
+
+#####################  Harmonics  ###########################
+harmonic1 = generateSineWave(40.9,waveTable)
+play(harmonic1)
+harmonic1diff = generateSineWaveFrequency(440,waveTable)
+play(harmonic1diff)
 harmonic2 = generateSineWave(2*40.9,waveTable)
 play(harmonic2)
+harmonic2diff = generateSineWaveFrequency(2*440,waveTable)
+play(harmonic2diff)
+harmonic3 = generateSineWave(3*40.9,waveTable)
+play(harmonic3)
+harmonic3diff = generateSineWaveFrequency(3*440,waveTable)
+play(harmonic3diff)
+harmonic4 = generateSineWave(4*40.9,waveTable)
+play(harmonic4)
+harmonic4diff = generateSineWaveFrequency(4*440,waveTable)
+play(harmonic4diff)
+#############################################################
 
-
-
-
+###################  Harmonics distortion  ##################
+tonesum = tone1 + harmonic4
+subplot(3,1,1)
+plot(np.linspace(0, len(tone1) / 44100, len(tone1)), tone1)
+axis([0,0.01,-2,2])
+subplot(3,1,2)
+plot(np.linspace(0, len(harmonic4) / 44100, len(harmonic4)), harmonic4)
+axis([0,0.01,-2,2])
+subplot(3,1,3)
+plot(np.linspace(0, len(tonesum) / 44100, len(tonesum)), tonesum)
+axis([0,0.01,-2,2])
+show()
+play(tonesum)
         
     
