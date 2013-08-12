@@ -106,7 +106,48 @@ def generateSineWaveRepeat(increment, waveTable, phaseIndex=0, soundLength=20, a
         indexing = len(waveTable)*soundLength - len(newProduct)
         newProduct = np.hstack((newProduct,product[0:indexing]))
     return newProduct
-    
+
+# Generating a square wave by filling an array with only 0s and 1s
+def generateSquareWave(tableLength, soundLength=20, amplitude=1):
+    numberOfEntries = 0
+    # The sine of the first angle to be put into the matrix
+    currentAngle = 0
+    # Look up table to store the samples
+    lookUpTable = np.array([0 for x in range(tableLength + 1)],np.float16)
+    index = 0
+    while(numberOfEntries != tableLength + 1):
+        lookUpTable[numberOfEntries] = amplitude * float (math.sin(math.radians(currentAngle)))
+        numberOfEntries += 1
+        if currentAngle == 180:
+            currentAngle = 0
+        if (index % 4) == 0: 
+            currentAngle += 90
+        index += 1
+    lookUpTable = np.repeat(lookUpTable,soundLength)
+    return lookUpTable
+
+
+
+#def generateSawtoothWave(tableLength, soundLength=20, amplitude=1):
+#    numberOfEntries = 0
+    # The sine of the first angle to be put into the matrix
+#    currentAngle = 0
+    # Look up table to store the samples
+#    lookUpTable = np.array([0 for x in range(tableLength + 1)],np.float16)
+#    index = 0
+#    while(numberOfEntries != tableLength + 1):
+#        lookUpTable[numberOfEntries] = amplitude * float (math.sin(math.radians(currentAngle)))
+#        numberOfEntries += 1
+#        if currentAngle == 180:
+#            currentAngle = 0
+#        if (index % 4) == 0: 
+#            currentAngle += 2 * math.pi * width
+#        index += 1
+#    lookUpTable = np.repeat(lookUpTable,soundLength)
+#    return lookUpTable
+
+#############################################################
+   
 waveTable = generateLookUpTable(4096)
 pr.enable()
 
@@ -132,8 +173,15 @@ plot(np.linspace(0, len(tone1) / 44100, len(tone1)), tone1)
 axis([0,0.01,-2,2])
 show()
 
+#sawtooth = tone1
+#for index in range(1,26):
+#    sawtooth += generateSineWave((1/float(index))*40.9,waveTable)
+#plot(np.linspace(0, len(sawtooth) / 44100, len(sawtooth)), sawtooth)
+#axis([0,0.01,-2,2])
+#show()
+#play(sawtooth)    
 
-############  Phase distortion  #############################
+####################  Phase distortion  #####################
 tone2 = generateSineWave(20,waveTable,phaseIndex=500)
 plot(np.linspace(0, len(tone2) / 44100, len(tone2)), tone2)
 axis([0,0.01,-2,2])
@@ -206,5 +254,61 @@ plot(np.linspace(0, len(tonesum) / 44100, len(tonesum)), tonesum)
 axis([0,0.01,-2,2])
 show()
 play(tonesum)
+
+tone3 = generateSineWave(20,waveTable,amplitude=0.5)
+play(tone3)
+
+tonesum1 = tone3 + harmonic2
+subplot(3,1,1)
+plot(np.linspace(0, len(tone3) / 44100, len(tone3)), tone3)
+axis([0,0.01,-2,2])
+subplot(3,1,2)
+plot(np.linspace(0, len(harmonic2) / 44100, len(harmonic2)), harmonic2)
+axis([0,0.01,-2,2])
+subplot(3,1,3)
+plot(np.linspace(0, len(tonesum1) / 44100, len(tonesum1)), tonesum1)
+axis([0,0.01,-2,2])
+show()
+play(tonesum)
         
     
+squaretone = generateSquareWave(4096)
+play(squaretone)
+plot(np.linspace(0, len(squaretone) / 44100, len(squaretone)), squaretone)
+axis([0,0.01,-2,2])
+show()
+
+squareandharmonic = squaretone + harmonic2
+#play(squareandharmonic)
+#plot(np.linspace(0, len(squareandharmonic) / 44100, len(squareandharmonic)), squareandharmonic)
+#axis([0,0.01,-2,2])
+#show()
+subplot(3,1,1)
+plot(np.linspace(0, len(squaretone) / 44100, len(squaretone)), squaretone)
+axis([0,0.01,-2,2])
+subplot(3,1,2)
+plot(np.linspace(0, len(harmonic2) / 44100, len(harmonic2)), harmonic2)
+axis([0,0.01,-2,2])
+subplot(3,1,3)
+plot(np.linspace(0, len(squareandharmonic) / 44100, len(squareandharmonic)), squareandharmonic)
+axis([0,0.01,-2,2])
+show()
+play(squareandharmonic)
+
+
+squareandtone = squaretone + tone1
+#play(squareandtone)
+#plot(np.linspace(0, len(squareandtone) / 44100, len(squareandtone)), squareandtone)
+#axis([0,0.01,-2,2])
+#show()
+subplot(3,1,1)
+plot(np.linspace(0, len(squaretone) / 44100, len(squaretone)), squaretone)
+axis([0,0.01,-2,2])
+subplot(3,1,2)
+plot(np.linspace(0, len(tone1) / 44100, len(tone1)), tone1)
+axis([0,0.01,-2,2])
+subplot(3,1,3)
+plot(np.linspace(0, len(squareandtone) / 44100, len(squareandtone)), squareandtone)
+axis([0,0.01,-2,2])
+show()
+play(squareandtone)
