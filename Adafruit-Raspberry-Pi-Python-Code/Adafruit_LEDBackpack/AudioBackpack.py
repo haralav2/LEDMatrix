@@ -21,10 +21,9 @@ frequencyRange     = []
 scaling = [2,2,2,2,2,2,2,2]
 
 # Set up audio
-#wavfile = wave.open('/home/pi/BassCannon0.wav','r')
 wavfile = wave.open('/home/pi/Beethoven_Symphony_n.wav','r')
 sampleRate = wavfile.getframerate()
-frameSize       = 4096 # Use a multiple of 8
+frameSize = 2048 
 output = aa.PCM(aa.PCM_PLAYBACK, aa.PCM_NORMAL)
 output.setchannels(wavfile.getnchannels())
 output.setrate(sampleRate)
@@ -69,7 +68,6 @@ def calculateColumns(data):
    return matrix
 
 
-print "Processing....."
 data = wavfile.readframes(frameSize)
 while len(data) != 0:
    if len(data) == 4*frameSize:
