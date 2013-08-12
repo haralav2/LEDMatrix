@@ -16,8 +16,8 @@ grid = ColorEightByEight(address=0x70)
 
 # Initialise matrix
 grid.clear()
-matrix    = [0,0,0,0,0,0,0,0]
-frequencyRange     = []
+matrix = [0,0,0,0,0,0,0,0]
+frequencyRange = []
 scaling = [2,2,2,2,2,2,2,2]
 
 # Set up audio
@@ -50,7 +50,7 @@ def calculateColumns(data):
    # Remove last element in array to make it the same size as frameSize
    frequencyRange=np.delete(frequencyRange,len(frequencyRange)-1)
    
-   # Find average 'amplitude' for specific frequency ranges in Hz
+   # Find average amplitude for specific frequency ranges in Hz
    matrix[0]= int(np.mean(frequencyRange[0                         :(frameSize - 7*binWidth)]))
    matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)  :(frameSize - 6*binWidth)]))
    matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)  :(frameSize - 5*binWidth)]))
