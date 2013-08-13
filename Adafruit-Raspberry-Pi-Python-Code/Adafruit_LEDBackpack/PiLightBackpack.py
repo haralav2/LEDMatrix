@@ -97,7 +97,7 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('Matrix')
+    pygame.display.set_caption('Pi Light)
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)

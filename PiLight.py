@@ -108,7 +108,7 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('Matrix')
+    pygame.display.set_caption('Pi Light')
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)
@@ -647,7 +647,7 @@ def changeButtonColour(button,array):
                             
                         
                     
-########## Dealing With Arrays and Multiplexing ######################## 
+################### Arrays and Multiplexing ############################ 
 
 # When a button is pressed 
 def arraysAdd(button):
@@ -718,7 +718,7 @@ def arrayChangeColour(button,previousColour):
 
 ################################# Demo #################################
         
-    
+   
 def ChristmasTree():
     tree = (buttons[4,0], buttons[3,1], buttons[4,1], buttons[5,1],
             buttons[2,2], buttons[3,2], buttons[4,2], buttons[5,2],
