@@ -85,7 +85,9 @@ def main():
            DEMO_SURF, DEMO_BUTTON, stateOfSelection, previousSelection, \
            GREENMODE, REDMODE, YELLOWMODE, NONEMODE
     
-    # For the LED matrix - we need 6 arrays - 3 for rows and 3 for columns,where we will store the corresponding addresses
+    # For the LED matrix - we need 3 arrays - one for each colour,
+    # where we will keep what values need to be send to the matrix to
+    # lit up a pattern
     yellowArray = [0,0,0,0,0,0,0,0]
     greenArray = [0,0,0,0,0,0,0,0]
     redArray = [0,0,0,0,0,0,0,0]
@@ -622,7 +624,7 @@ def changeButtonColour(button,array):
                             
                         
                     
-####################################################### Demo ########################################################################################
+############################ Demo ######################################
         
     
 def ChristmasTree():
@@ -701,7 +703,8 @@ def Candle():
     for rows in range(4,8):
         for columns in range(2,5):
             drawButtonWithColour(buttons[columns,rows],BRIGHTYELLOW)
-            grid.setPixel(getButtonRow(buttons[columns,rows]),getButtonColumn(buttons[columns,rows]),3)
+            grid.setPixel(getButtonRow(buttons[columns,rows]),
+                          getButtonColumn(buttons[columns,rows]),3)
             arraysAddColour(buttons[columns,rows],BRIGHTYELLOW)
             pygame.display.update()
     drawButtonWithColour(buttons[3,2],BRIGHTRED)
