@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# 8 band Audio equaliser from wav file
-
 import alsaaudio as aa
 import smbus
 from struct import unpack
