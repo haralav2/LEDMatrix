@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# 8 band Audio equaliser from wav file
-
 import alsaaudio as aa
 import smbus
 from struct import unpack
@@ -38,12 +36,13 @@ def calculateColumns(data):
    data = unpack("%dh"%(len(data)/2),data)
    data = np.array(data, dtype='h')
    
-   # Use the fast fourier transform to convert a wave from the time domain
-   # to the frequency domain
+   # Use the fast fourier transform to convert a wave from the time 
+   # domain to the frequency domain
    realFourier = np.fft.rfft(data)
    
    # With the absolute function only postive values remain   
-   # 0.01 is added to deal with the case when a frequency range is not present
+   # 0.01 is added to deal with the case when a frequency range is
+   # not present
    # Keeps from log10(0) to throw an error later on 
    frequencyRange = np.log10(np.add(np.abs(realFourier),0.01))**2
    
@@ -51,14 +50,22 @@ def calculateColumns(data):
    frequencyRange=np.delete(frequencyRange,len(frequencyRange)-1)
    
    # Find average amplitude for specific frequency ranges in Hz
-   matrix[0]= int(np.mean(frequencyRange[0                         :(frameSize - 7*binWidth)]))
-   matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)  :(frameSize - 6*binWidth)]))
-   matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)  :(frameSize - 5*binWidth)]))
-   matrix[3]= int(np.mean(frequencyRange[(frameSize - 5*binWidth)  :(frameSize - 4*binWidth)]))
-   matrix[4]= int(np.mean(frequencyRange[(frameSize - 4*binWidth)  :(frameSize - 3*binWidth)]))
-   matrix[5]= int(np.mean(frequencyRange[(frameSize - 3*binWidth)  :(frameSize - 2*binWidth)]))
-   matrix[6]= int(np.mean(frequencyRange[(frameSize - 2*binWidth)  :(frameSize - binWidth)]))
-   matrix[7]= int(np.mean(frequencyRange[(frameSize - binWidth)    :frameSize]))
+   matrix[0]= int(np.mean(frequencyRange[0
+                                         :(frameSize - 7*binWidth)]))
+   matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)
+                                         :(frameSize - 6*binWidth)]))
+   matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)
+                                         :(frameSize - 5*binWidth)]))
+   matrix[3]= int(np.mean(frequencyRange[(frameSize - 5*binWidth)
+                                         :(frameSize - 4*binWidth)]))
+   matrix[4]= int(np.mean(frequencyRange[(frameSize - 4*binWidth)
+                                         :(frameSize - 3*binWidth)]))
+   matrix[5]= int(np.mean(frequencyRange[(frameSize - 3*binWidth)
+                                         :(frameSize - 2*binWidth)]))
+   matrix[6]= int(np.mean(frequencyRange[(frameSize - 2*binWidth)
+                                         :(frameSize - binWidth)]))
+   matrix[7]= int(np.mean(frequencyRange[(frameSize - binWidth)
+                                         :frameSize]))
     
    # Tidy up column values for the LED matrix
    matrix=np.divide(np.multiply(matrix,2),5)

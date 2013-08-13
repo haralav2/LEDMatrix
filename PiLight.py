@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-#########                    Authors                  ##################
-#########                    PiLight                  ################## 
+#########                    PiLight                  ##################
+#########                    Authors                  ################## 
 #########               Veneta Haralampieva           ##################
 
 import random
@@ -163,6 +163,7 @@ def main():
     DEMO_SURF, DEMO_BUTTON = makeText('   DEMO   ',TEXTColour,PURPLE,
                                       XMARGIN + 4.5*(LEDSIZE + BUTTONGAPSIZE),
                                       YMARGIN + 8*(LEDSIZE + BUTTONGAPSIZE))
+    
     # Initialize some variables for a new game
     pattern = [] # stores the pattern of LEDs clicked
     

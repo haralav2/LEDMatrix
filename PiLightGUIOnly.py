@@ -1,12 +1,8 @@
 #!/usr/bin/python
 
-#########                    Authors                  ##################
-#########                    PiLight                  ################## 
+#########                    PiLight                  ##################
+#########                    Authors                  ################## 
 #########               Veneta Haralampieva           ##################
-
-
-
-
 
 import random
 import sys
