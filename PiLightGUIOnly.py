@@ -95,7 +95,8 @@ def main():
            NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, \
            GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, \
            RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, \
-           DEMO_SURF, DEMO_BUTTON
+           DEMO_SURF, DEMO_BUTTON, stateOfSelection, previousSelection, \
+           GREENMODE, REDMODE, YELLOWMODE, NONEMODE
 
     # For the LED matrix - we need 3 arrays - one for each colour,
     # where we will keep what values need to be send to the matrix to
@@ -501,24 +502,24 @@ def drawAllButtons():
                 drawButtonWithColour(buttons[rows,columns],
                                      SbuttonsColour[rows,columns])
                 
-def getButtonClicked(x, y):
+def getButtonClicked(x,y):
     for rows in range(0,8):
         for columns in range(0,8):
-            if buttons[rows,columns].collidepoint( (x,y) ):
+            if buttons[rows,columns].collidepoint((x,y)):
                 return buttons[rows,columns]
-    if RED_BUTTON.collidepoint( (x, y) ):
+    if RED_BUTTON.collidepoint((x,y)):
         return RED
-    elif GREEN_BUTTON.collidepoint( (x, y) ):
+    elif GREEN_BUTTON.collidepoint((x,y)):
         return GREEN
-    elif YELLOW_BUTTON.collidepoint( (x, y) ):
+    elif YELLOW_BUTTON.collidepoint((x,y)):
         return YELLOW
-    elif NONE_BUTTON.collidepoint( (x, y) ):
+    elif NONE_BUTTON.collidepoint((x,y)):
         return DARKGRAY
-    elif SEE_BUTTON.collidepoint( (x, y) ):
+    elif SEE_BUTTON.collidepoint((x,y)):
         return BLUE
-    elif DEMO_BUTTON.collidepoint( (x, y) ):
+    elif DEMO_BUTTON.collidepoint((x,y)):
         return PURPLE
-    elif CLEAR_BUTTON.collidepoint( (x, y) ):
+    elif CLEAR_BUTTON.collidepoint((x,y)):
         return GRAY
     
     return None

@@ -14,16 +14,6 @@ import numpy as np
 from numpy import *
 import Bicolour_Interface as bci
 
-
-
-# Definitions for the MCP23017
-ADDRR = 0x20   # I2C bus address of the 23017 Rows
-ADDRC = 0x21   # I2C bus address of the 23017 Columns
-DIRA  = 0x00   # PortA I/O direction
-DIRB  = 0x01   # PortB I/O direction
-PORTA = 0x12   # PortA data register
-PORTB = 0x13   # PortB data register
-
 # Defining some constant variables
 FPS = 30
 BOARDWIDTH = 10
@@ -104,10 +94,8 @@ def main():
            NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, \
            GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, \
            RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, \
-           DEMO_SURF, DEMO_BUTTON
-    
-    # I2C bus that controls the LED matrix
-    bus = smbus.SMBus(1)
+           DEMO_SURF, DEMO_BUTTON, stateOfSelection, previousSelection, \
+           GREENMODE, REDMODE, YELLOWMODE, NONEMODE
 
     # For the LED matrix - we need 3 arrays - one for each colour,
     # where we will keep what values need to be send to the matrix to
@@ -562,24 +550,24 @@ def drawAllButtons():
                                      buttonsColour[rows,columns])
 
 # Function that returns the button which has been clicked                
-def getButtonClicked(x, y):
+def getButtonClicked(x,y):
     for rows in range(0,8):
         for columns in range(0,8):
-            if buttons[rows,columns].collidepoint( (x,y) ):
+            if buttons[rows,columns].collidepoint((x,y)):
                 return buttons[rows,columns]
-    if RED_BUTTON.collidepoint( (x, y) ):
+    if RED_BUTTON.collidepoint((x,y)):
         return RED
-    elif GREEN_BUTTON.collidepoint( (x, y) ):
+    elif GREEN_BUTTON.collidepoint((x,y)):
         return GREEN
-    elif YELLOW_BUTTON.collidepoint( (x, y) ):
+    elif YELLOW_BUTTON.collidepoint((x,y)):
         return YELLOW
-    elif NONE_BUTTON.collidepoint( (x, y) ):
+    elif NONE_BUTTON.collidepoint((x,y)):
         return DARKGRAY
-    elif SEE_BUTTON.collidepoint( (x, y) ):
+    elif SEE_BUTTON.collidepoint((x,y)):
         return BLUE
-    elif DEMO_BUTTON.collidepoint( (x, y) ):
+    elif DEMO_BUTTON.collidepoint((x,y)):
         return PURPLE
-    elif CLEAR_BUTTON.collidepoint( (x, y) ):
+    elif CLEAR_BUTTON.collidepoint((x,y)):
         return GRAY
     
     return None
