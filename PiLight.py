@@ -114,9 +114,9 @@ def main():
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)
     infoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
                                    2, WHITE)
-    infoSurfTwo = BASICFONT.render('To change the colour of just one LED press on it one more time.',
+    infoSurfTwo = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
                                    2, WHITE)
-    infoSurfThree = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
+    infoSurfThree = BASICFONT.render('To clear all selection press CLEAR. To see some demos press DEMO',
                                      2, WHITE)
     infoRectOne = infoSurfOne.get_rect()
     infoRectOne.topleft = (10, WINDOWHEIGHT - 60)
