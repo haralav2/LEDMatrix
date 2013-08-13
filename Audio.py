@@ -11,25 +11,6 @@ import time
 import Bicolour_Interface
 
 
-bus=smbus.SMBus(1)
-
-# Definitions for the MCP23017
-ADDRR = 0x20   # I2C bus address of the 23017 Rows
-ADDRC = 0x21   # I2C bus address of the 23017 Columns
-DIRA  = 0x00   # PortA I/O direction
-DIRB  = 0x01   # PortB I/O direction
-PORTA = 0x12   # PortA data register
-PORTB = 0x13   # PortB data register
-
-
-#Set up the 23017 for 16 output pins
-bus.write_byte_data(ADDRR,DIRA,0x00)   # All outputs on PortA address 0x20
-bus.write_byte_data(ADDRR,DIRB,0x00)   # All outputs on PortB address 0x20
-bus.write_byte_data(ADDRC,DIRA,0x00)   # All outputs on PortA address 0x21 - green
-bus.write_byte_data(ADDRC,DIRB,0x00)   # All outputs on PortB address 0x21 - red
-
-
-
 # Initialise matrix
 Bicolour_Interface.initialise()
 matrix = [0,0,0,0,0,0,0,0]
@@ -67,14 +48,22 @@ def calculateColumns(data):
    frequencyRange=np.delete(frequencyRange,len(frequencyRange)-1)
    
    # Find average amplitude for specific frequency ranges in Hz
-   matrix[0]= int(np.mean(frequencyRange[0                         :(frameSize - 7*binWidth)]))
-   matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)  :(frameSize - 6*binWidth)]))
-   matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)  :(frameSize - 5*binWidth)]))
-   matrix[3]= int(np.mean(frequencyRange[(frameSize - 5*binWidth)  :(frameSize - 4*binWidth)]))
-   matrix[4]= int(np.mean(frequencyRange[(frameSize - 4*binWidth)  :(frameSize - 3*binWidth)]))
-   matrix[5]= int(np.mean(frequencyRange[(frameSize - 3*binWidth)  :(frameSize - 2*binWidth)]))
-   matrix[6]= int(np.mean(frequencyRange[(frameSize - 2*binWidth)  :(frameSize - binWidth)]))
-   matrix[7]= int(np.mean(frequencyRange[(frameSize - binWidth)    :frameSize]))
+   matrix[0]= int(np.mean(frequencyRange[0                         
+                                         :(frameSize - 7*binWidth)]))
+   matrix[1]= int(np.mean(frequencyRange[(frameSize - 7*binWidth)
+                                         :(frameSize - 6*binWidth)]))
+   matrix[2]= int(np.mean(frequencyRange[(frameSize - 6*binWidth)
+                                         :(frameSize - 5*binWidth)]))
+   matrix[3]= int(np.mean(frequencyRange[(frameSize - 5*binWidth)
+                                         :(frameSize - 4*binWidth)]))
+   matrix[4]= int(np.mean(frequencyRange[(frameSize - 4*binWidth)
+                                         :(frameSize - 3*binWidth)]))
+   matrix[5]= int(np.mean(frequencyRange[(frameSize - 3*binWidth)
+                                         :(frameSize - 2*binWidth)]))
+   matrix[6]= int(np.mean(frequencyRange[(frameSize - 2*binWidth)
+                                         :(frameSize - binWidth)]))
+   matrix[7]= int(np.mean(frequencyRange[(frameSize - binWidth)
+                                         :frameSize]))
     
    # Tidy up column values for the LED matrix
    matrix=np.divide(np.multiply(matrix,2),5)
