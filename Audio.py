@@ -35,12 +35,13 @@ def calculateColumns(data):
    data = unpack("%dh"%(len(data)/2),data)
    data = np.array(data, dtype='h')
    
-   # Use the fast fourier transform to convert a wave from the time domain
-   # to the frequency domain
+   # Use the fast fourier transform to convert a wave from the time 
+   # domain to the frequency domain
    realFourier = np.fft.rfft(data)
    
    # With the absolute function only postive values remain   
-   # 0.01 is added to deal with the case when a frequency range is not present
+   # 0.01 is added to deal with the case when a frequency range
+   # is not present
    # Keeps from log10(0) to throw an error later on 
    frequencyRange = np.log10(np.add(np.abs(realFourier),0.01))**2
    
