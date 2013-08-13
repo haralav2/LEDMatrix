@@ -1,6 +1,8 @@
-#############################################   Authors   ###########################################
-###########################                     PiLight                  ############################  
-###########################               Veneta Haralampieva           #############################
+#!/usr/bin/python
+
+#################################   Authors   ##########################
+#############                     PiLight                  #############  
+############               Veneta Haralampieva           ###############
 
 
 
@@ -26,9 +28,9 @@ WINDOWWIDTH = 800
 # The height of the window for the game
 WINDOWHEIGHT = 800
 
-FLASHSPEED = 500 # in milliseconds
+FLASHSPEED = 500
 
-FLASHDELAY = 200 # in milliseconds
+FLASHDELAY = 200
 
 # Size of the buttons that represent the LEDS
 LEDSIZE = 60
@@ -66,16 +68,20 @@ LEDInitialColour = DARKGRAY
 bgColour = BLACK
 
 # Set the margin on the x axix
-XMARGIN = int((WINDOWWIDTH - (LEDSIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2 + 60)
+XMARGIN = int((WINDOWWIDTH - (LEDSIZE*BOARDWIDTH
+                              + (BOARDWIDTH - 1))) / 2 + 60)
 
 # Set the margin on the y axix
-YMARGIN = int((WINDOWHEIGHT - (LEDSIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
+YMARGIN = int((WINDOWHEIGHT - (LEDSIZE * BOARDHEIGHT
+                               + (BOARDHEIGHT - 1))) / 2)
 
 # Rect objects for each of the 64 buttons using a numpy array
 buttons = np.empty((8,8), dtype=object)
 for rows in range(0,8):
     for columns in range(0,8):
-        buttons[rows,columns] = pygame.Rect(XMARGIN + rows * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + columns * (LEDSIZE + BUTTONGAPSIZE),LEDSIZE, LEDSIZE)
+        buttons[rows,columns] = pygame.Rect(XMARGIN + (rows*(LEDSIZE + BUTTONGAPSIZE)),
+                                            YMARGIN + (columns*(LEDSIZE + BUTTONGAPSIZE)),
+                                            LEDSIZE,LEDSIZE)
 
 # Numpy array, which stores all the Colours of the corresponding buttons 
 buttonsColour = np.empty((8,8), dtype=object)
@@ -83,9 +89,17 @@ buttonsColour = np.empty((8,8), dtype=object)
     
 # Main method
 def main():
-    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, piano2, piano3, piano4, piano5, piano6, piano7, piano8, DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF,NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, DEMO_SURF, DEMO_BUTTON
+    global FPSCLOCK, yellowArray, redArray, greenArray, bus, piano1, \
+           piano2, piano3, piano4, piano5, piano6, piano7, piano8, \
+           DISPLAYSURF, CLEAR_SURF, CLEAR_BUTTON, NONE_SURF, \
+           NONE_BUTTON, BASICFONT, LEDInitialColour, GREEN_SURF, \
+           GREEN_BUTTON, YELLOW_SURF, YELLOW_BUTTON, RED_SURF, \
+           RED_BUTTON, SEE_SURF, SEE_BUTTON, BASICTEXTFONT, \
+           DEMO_SURF, DEMO_BUTTON
 
-    # For the LED matrix - we need 3 arrays - one for each colour, where we will keep what values need to be send to the matrix to lit up a pattern
+    # For the LED matrix - we need 3 arrays - one for each colour,
+    # where we will keep what values need to be send to the matrix to
+    # lit up a pattern
     yellowArray = [0,0,0,0,0,0,0,0]
     greenArray = [0,0,0,0,0,0,0,0]
     redArray = [0,0,0,0,0,0,0,0]
@@ -98,9 +112,12 @@ def main():
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)
-    infoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.', 2, WHITE)
-    infoSurfTwo = BASICFONT.render('To change the colour of just one LED press on it one more time.', 2, WHITE)
-    infoSurfThree = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.', 2, WHITE)
+    infoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
+                                   2, WHITE)
+    infoSurfTwo = BASICFONT.render('To change the colour of just one LED press on it one more time.',
+                                   2,WHITE)
+    infoSurfThree = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
+                                     2,WHITE)
     infoRectOne = infoSurfOne.get_rect()
     infoRectOne.topleft = (10, WINDOWHEIGHT - 60)
     infoRectTwo = infoSurfTwo.get_rect()
@@ -119,19 +136,33 @@ def main():
     piano8 = pygame.mixer.Sound('piano-g.wav')
 
     # Change LED colour buttons
-    GREEN_SURF,GREEN_BUTTON = makeText(' GREEN  ', TEXTColour, GREEN, XMARGIN - 2 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 1 * (LEDSIZE + BUTTONGAPSIZE))
-    YELLOW_SURF,YELLOW_BUTTON = makeText('YELLOW', TEXTColour, YELLOW, XMARGIN - 2 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 2 * (LEDSIZE + BUTTONGAPSIZE))
-    RED_SURF,RED_BUTTON = makeText('    RED    ', TEXTColour, RED, XMARGIN - 2 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 3 * (LEDSIZE + BUTTONGAPSIZE))
+    GREEN_SURF,GREEN_BUTTON = makeText(' GREEN  ',TEXTColour,GREEN,
+                                       XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
+                                       YMARGIN + 1*(LEDSIZE + BUTTONGAPSIZE))
+    YELLOW_SURF,YELLOW_BUTTON = makeText('YELLOW',TEXTColour,YELLOW,
+                                         XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
+                                         YMARGIN + 2*(LEDSIZE + BUTTONGAPSIZE))
+    RED_SURF,RED_BUTTON = makeText('    RED    ',TEXTColour,RED,
+                                   XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
+                                   YMARGIN + 3*(LEDSIZE + BUTTONGAPSIZE))
 
     # Unselect a single button
-    NONE_SURF,NONE_BUTTON = makeText('  NONE   ',TEXTColour, DARKGRAY, XMARGIN - 2 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 4 * (LEDSIZE + BUTTONGAPSIZE))
+    NONE_SURF,NONE_BUTTON = makeText('  NONE   ',TEXTColour,DARKGRAY,
+                                     XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
+                                     YMARGIN + 4*(LEDSIZE + BUTTONGAPSIZE))
 
     # Clear the entira pattern
-    CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour, GRAY, XMARGIN - 2 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 5 * (LEDSIZE + BUTTONGAPSIZE))
+    CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour,GRAY,
+                                       XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
+                                       YMARGIN + 5*(LEDSIZE + BUTTONGAPSIZE))
 
-    SEE_SURF, SEE_BUTTON = makeText('    SEE     ', TEXTColour, BLUE, XMARGIN + 1.5 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (LEDSIZE + BUTTONGAPSIZE))
+    SEE_SURF, SEE_BUTTON = makeText('    SEE     ',TEXTColour,BLUE,
+                                    XMARGIN + 1.5*(LEDSIZE + BUTTONGAPSIZE),
+                                    YMARGIN + 8*(LEDSIZE + BUTTONGAPSIZE))
 
-    DEMO_SURF, DEMO_BUTTON = makeText('   DEMO   ', TEXTColour, PURPLE, XMARGIN + 4.5 * (LEDSIZE + BUTTONGAPSIZE),YMARGIN + 8 * (LEDSIZE + BUTTONGAPSIZE))
+    DEMO_SURF, DEMO_BUTTON = makeText('   DEMO   ',TEXTColour,PURPLE,
+                                      XMARGIN + 4.5*(LEDSIZE + BUTTONGAPSIZE),
+                                      YMARGIN + 8*(LEDSIZE + BUTTONGAPSIZE))
 
     # Initialize some variables for a new game
     pattern = [] # stores the pattern of LEDs clicked
@@ -170,7 +201,7 @@ def main():
         DISPLAYSURF.blit(infoSurfThree, infoRectThree)
          
         checkForQuit()
-        for event in pygame.event.get(): # event handling loop
+        for event in pygame.event.get(): 
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
@@ -206,7 +237,8 @@ def main():
                         pygame.display.update()
                         pygame.time.wait(1000)
                         for button in pattern:
-                            drawButtonWithColour(button, getButtonColour(button))
+                            drawButtonWithColour(button,
+                                                 getButtonColour(button))
                         flashButtonAnimationBig(clickedButton)
                         for button in pattern:
                             flashColour(button)
@@ -322,13 +354,21 @@ def makeText(text, Colour, bgColour, top, left):
 
 
 def checkForQuit():
-    for event in pygame.event.get(QUIT): # get all the QUIT events
-        terminate() # terminate if any QUIT events are present
-    for event in pygame.event.get(KEYUP): # get all the KEYUP events
+    # get all the QUIT events
+    for event in pygame.event.get(QUIT):
+        # terminate if any QUIT events are present
+        terminate() 
+        Bicolour_Interface.turnOffAll()
+        # get all the KEYUP events
+    for event in pygame.event.get(KEYUP): 
         if event.key == K_ESCAPE:
-            terminate() # terminate if the KEYUP event was for the Esc key
-        pygame.event.post(event) # put the other KEYUP event objects back
+            # terminate if the KEYUP event was for the Esc key
+            terminate() 
+            Bicolour_Interface.turnOffAll()
+        # put the other KEYUP event objects back
+        pygame.event.post(event)
 
+        
 def playSoundForButton(col):
     if col == 0:
         return piano1
@@ -382,7 +422,8 @@ def flashColour(Colour, animationSpeed=100):
                     FPSCLOCK.tick(FPS)
 
     
-# Flash the menu buttons -  RED, YELLOW, GREEN, SEE, DEMO, NONE and CLEAR
+# Flash the menu buttons - RED, YELLOW, GREEN,
+# SEE, DEMO, NONE and CLEAR
 def flashButtonAnimationBig(colour, animationSpeed=50):
     if colour == RED:
         flashColour = BRIGHTRED
@@ -425,7 +466,7 @@ def flashButtonAnimationBig(colour, animationSpeed=50):
     flashSurf = pygame.Surface((buttonWidth, buttonHeight))
     flashSurf = flashSurf.convert_alpha()
     r, g, b = flashColour
-    for start, end, step in ((0, 255, 1), (255, 0, -1)): # animation loop
+    for start, end, step in ((0, 255, 1), (255, 0, -1)):
         for alpha in range(start, end, animationSpeed * step):
             checkForQuit()
             DISPLAYSURF.blit(origSurf, (0, 0))
@@ -457,7 +498,8 @@ def drawAllButtonsWithColour(colour):
 def drawAllButtons():
     for rows in range(0,8):
             for columns in range(0,8):
-                drawButtonWithColour(buttons[rows,columns], buttonsColour[rows,columns])
+                drawButtonWithColour(buttons[rows,columns],
+                                     SbuttonsColour[rows,columns])
                 
 def getButtonClicked(x, y):
     for rows in range(0,8):
@@ -519,52 +561,39 @@ def getFlashColour(button):
                 elif buttonsColour[rows,columns] == GREEN:
                     return BRIGHTGREEN
 
-# Change the button colours to match the selected mode - yellow, green or red
+# Change the button colours to match the selected mode -
+# Syellow, green or red
 # The normal mode is selecting green leds
 def changeButtonColour(button,array):
     for rows in range(0,8):
         for columns in range(0,8):
             if button == buttons[rows,columns]:
                 if stateOfSelection == GREENMODE:
-                    if buttonsColour[rows,columns] == DARKGRAY:
-                        buttonsColour[rows,columns] = GREEN
-                    elif buttonsColour[rows,columns] == RED:
-                        buttonsColour[rows,columns] = GREEN
-                    elif buttonsColour[rows,columns] == YELLOW:
-                        buttonsColour[rows,columns] = GREEN
-                    elif buttonsColour[rows,columns] == GREEN:
+                    if buttonsColour[rows,columns] == GREEN:
                         buttonsColour[rows,columns] = DARKGRAY
                         array.remove(button)
                         arraysRemove(button)
+                    else:
+                        buttonsColour[rows,columns] = GREEN
                 elif stateOfSelection == REDMODE:
-                    if buttonsColour[rows,columns] == DARKGRAY:
-                        buttonsColour[rows,columns] = RED
-                    elif buttonsColour[rows,columns] == GREEN:
-                        buttonsColour[rows,columns] = RED
-                    elif buttonsColour[rows,columns] == YELLOW:
-                        buttonsColour[rows,columns] = RED
-                    elif buttonsColour[rows,columns] == RED:
+                    if buttonsColour[rows,columns] == RED:
                         buttonsColour[rows,columns] = DARKGRAY
                         array.remove(button)
                         arraysRemove(button)
-                        
+                    else:
+                        buttonsColour[rows,columns] = RED
                 elif stateOfSelection == YELLOWMODE:
-                    if buttonsColour[rows,columns] == DARKGRAY:
-                        buttonsColour[rows,columns] = YELLOW
-                    elif buttonsColour[rows,columns] == GREEN:
-                        buttonsColour[rows,columns] = YELLOW
-                    elif buttonsColour[rows,columns] == YELLOW:
+                    if buttonsColour[rows,columns] == YELLOW:
                         buttonsColour[rows,columns] = DARKGRAY
                         array.remove(button)
                         arraysRemove(button)
-                    elif buttonsColour[rows,columns] == RED:
+                    else:
                         buttonsColour[rows,columns] = YELLOW
                 elif stateOfSelection == NONEMODE:
                     buttonsColour[rows,columns] = DARKGRAY
                     if button in array:
                         array.remove(button)
                         arraysRemove(button)
-                            
                         
                     
 ########## Dealing With Arrays and Multiplexing ######################## 
@@ -636,14 +665,20 @@ def arrayChangeColour(button,previousColour):
         arraysAddColour(button,newColour)
         arraysRemoveColour(button,previousColour)
 
-####################################################### Demo ########################################################################################
+############################### Demo ###################################
         
     
 def ChristmasTree():
-    tree = (buttons[4,0], buttons[3,1], buttons[4,1], buttons[5,1], buttons[2,2], buttons[3,2], buttons[4,2], buttons[5,2], buttons[6,2], buttons[2,3],
-            buttons[3,3], buttons[4,3], buttons[5,3], buttons[6,3], buttons[1,4], buttons[2,4], buttons[3,4], buttons[4,4], buttons[5,4], buttons[6,4],
-            buttons[7,4], buttons[1,5], buttons[2,5], buttons[3,5], buttons[4,5], buttons[5,5], buttons[6,5], buttons[7,5], buttons[0,6], buttons[1,6],
-            buttons[2,6], buttons[3,6], buttons[5,6], buttons[6,6], buttons[7,6], buttons[4,6], buttons[4,7])
+    tree = (buttons[4,0], buttons[3,1], buttons[4,1], buttons[5,1],
+            buttons[2,2], buttons[3,2], buttons[4,2], buttons[5,2],
+            buttons[6,2], buttons[2,3], buttons[3,3], buttons[4,3],
+            buttons[5,3], buttons[6,3], buttons[1,4], buttons[2,4],
+            buttons[3,4], buttons[4,4], buttons[5,4], buttons[6,4],
+            buttons[7,4], buttons[1,5], buttons[2,5], buttons[3,5],
+            buttons[4,5], buttons[5,5], buttons[6,5], buttons[7,5],
+            buttons[0,6], buttons[1,6], buttons[2,6], buttons[3,6],
+            buttons[5,6], buttons[6,6], buttons[7,6], buttons[4,6],
+            buttons[4,7])
 
     for index in range(0,35):
         drawButtonWithColour(tree[index],BRIGHTGREEN)
@@ -661,7 +696,8 @@ def ChristmasTree():
 
 
 def Sun():
-    sun = (buttons[3,2], buttons[4,2], buttons[2,3], buttons[3,3], buttons[4,3], buttons[5,3], buttons[2,4], buttons[3,4],
+    sun = (buttons[3,2], buttons[4,2], buttons[2,3], buttons[3,3],
+           buttons[4,3], buttons[5,3], buttons[2,4], buttons[3,4],
            buttons[4,4], buttons[5,4], buttons[3,5], buttons[4,5])
     for index in range(0,12):
         drawButtonWithColour(sun[index],BRIGHTYELLOW)
@@ -672,7 +708,9 @@ def Sun():
         drawButtonWithColour(button,getButtonColour(button))
 
 def Present():
-    present = (buttons[2,5], buttons[4,5], buttons[2,7], buttons[4,7], buttons[3,5], buttons[3,6], buttons[3,7], buttons[2,6], buttons[4,6], buttons[3,4])
+    present = (buttons[2,5], buttons[4,5], buttons[2,7], buttons[4,7],
+               buttons[3,5], buttons[3,6], buttons[3,7], buttons[2,6],
+               buttons[4,6], buttons[3,4])
     for index in range(0,4):
         drawButtonWithColour(present[index],BRIGHTRED)
         arraysAddColour(present[index],RED)
@@ -707,24 +745,30 @@ def ChasingLights():
         if rows % 2 == 0:
             for columns in range(0,10):
                 if columns >= 0 and columns < 8:
-                    drawButtonWithColour(buttons[columns,rows],BRIGHTYELLOW)
+                    drawButtonWithColour(buttons[columns,rows],
+                                         BRIGHTYELLOW)
                     pygame.display.update()
                 if columns > 0 and columns < 9:
-                    drawButtonWithColour(buttons[columns - 1,rows],BRIGHTGREEN)
+                    drawButtonWithColour(buttons[columns - 1,rows],
+                                         BRIGHTGREEN)
                     pygame.display.update()
                 if columns > 1:
-                    drawButtonWithColour(buttons[columns - 2,rows],BRIGHTRED)
+                    drawButtonWithColour(buttons[columns - 2,rows],
+                                         BRIGHTRED)
                     pygame.display.update()
         else:
             for columns in range(8,-3, -1):
                 if columns < 8 and columns >= 0:
-                    drawButtonWithColour(buttons[columns,rows],BRIGHTYELLOW)
+                    drawButtonWithColour(buttons[columns,rows],
+                                         BRIGHTYELLOW)
                     pygame.display.update()
                 if columns < 7 and columns >= -1 :
-                    drawButtonWithColour(buttons[columns + 1,rows],BRIGHTGREEN)
+                    drawButtonWithColour(buttons[columns + 1,rows],
+                                         BRIGHTGREEN)
                     pygame.display.update()
                 if columns < 6 and columns >= -2:
-                    drawButtonWithColour(buttons[columns + 2,rows],BRIGHTRED)
+                    drawButtonWithColour(buttons[columns + 2,rows],
+                                         BRIGHTRED)
                     pygame.display.update()
 
             
@@ -765,9 +809,11 @@ def RaspberryPi():
 
 
 def Hi():
-    hi = (buttons[1,2], buttons[1,3], buttons[1,4], buttons[1,5], buttons[1,6], buttons[2,4], buttons[3,2], buttons[3,3], buttons[3,4],
-          buttons[3,5], buttons[3,6], buttons[5,2], buttons[6,2], buttons[7,2], buttons[6,3], buttons[6,4], buttons[6,5], buttons[6,6],
-          buttons[7,6], buttons[5,6])
+    hi = (buttons[1,2], buttons[1,3], buttons[1,4], buttons[1,5],
+          buttons[1,6], buttons[2,4], buttons[3,2], buttons[3,3],
+          buttons[3,4], buttons[3,5], buttons[3,6], buttons[5,2],
+          buttons[6,2], buttons[7,2], buttons[6,3], buttons[6,4],
+          buttons[6,5], buttons[6,6], buttons[7,6], buttons[5,6])
     for button in hi:
         drawButtonWithColour(button,BRIGHTYELLOW)
         arraysAddColour(button,BRIGHTYELLOW)
@@ -789,7 +835,7 @@ def FlashingDot(Colour,animationSpeed = 100):
             flashSurf = pygame.Surface((LEDSIZE, LEDSIZE))
             flashSurf = flashSurf.convert_alpha()
             r, g, b = flashColour
-            for start, end, step in ((0, 255, 1), (255, 0, -1)): # animation loop
+            for start, end, step in ((0, 255, 1), (255, 0, -1)): 
                 for alpha in range(start, end, animationSpeed * step):
                     checkForQuit()
                     DISPLAYSURF.blit(origSurf, (0, 0))
@@ -799,7 +845,7 @@ def FlashingDot(Colour,animationSpeed = 100):
                     FPSCLOCK.tick(FPS)
             DISPLAYSURF.blit(origSurf, (0, 0))
             
-###################################################################################################################################################
+########################################################################
 
     
 if __name__ == '__main__':
