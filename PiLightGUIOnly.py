@@ -169,19 +169,23 @@ def main():
             
     # When false it indicates that the player cannot click on the gray buttons
     drawOnBoard = True
-    global GREENMODE
+
+    # Light green LEDs
     GREENMODE = 1
-    global REDMODE
+
+    # Light red LEDs
     REDMODE = 2
-    global YELLOWMODE
+
+    # Light yellow LEDs
     YELLOWMODE = 3
-    global NONEMODE
+
+    # Unselect a LED
     NONEMODE = 4
-    global CLEARMODE
-    CLEARMODE = 5
-    global stateOfSelection
+
+    # Which of the above is selected, initially green 
     stateOfSelection = GREENMODE
-    global previousSelection
+
+    # Which mode was previously selected
     previousSelection = 0
     while True: # main game loop
         
