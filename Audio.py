@@ -16,15 +16,27 @@ frequencyRange = []
 scaling = [2,2,2,2,2,2,2,2]
 
 # Set up audio
+
+# Open the wave file
 wavfile = wave.open('/home/pi/Beethoven_Symphony_n.wav','r')
+
+# We are going to use the frame rate from the file as a
+# sample rate in our output
 sampleRate = wavfile.getframerate()
+
+# Set the frame size - advisable to be  multiple of 8
 frameSize = 2048
+
+# Setup the output 
 output = aa.PCM(aa.PCM_PLAYBACK, aa.PCM_NORMAL)
+
+# Set the channels of the output to be the same as those of our file
 output.setchannels(wavfile.getnchannels())
 output.setrate(sampleRate)
 output.setformat(aa.PCM_FORMAT_S16_LE)
 output.setperiodsize(frameSize)
 
+# Gives us the size of each of the frequncy range grouped together
 binWidth = frameSize / 8
 
 def calculateColumns(data):
@@ -38,8 +50,8 @@ def calculateColumns(data):
    realFourier = np.fft.rfft(data)
    
    # With the absolute function only postive values remain   
-   # 0.01 is added to deal with the case when a frequency range
-   # is not present
+   # 0.01 is added to deal with the case when a frequency range is
+   # not present - sometimes in the beginning of a file there is silence
    # Keeps from log10(0) to throw an error later on 
    frequencyRange = np.log10(np.add(np.abs(realFourier),0.01))**2
    
