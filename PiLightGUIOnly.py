@@ -518,7 +518,7 @@ def drawAllButtons():
     for rows in range(0,8):
             for columns in range(0,8):
                 drawButtonWithColour(buttons[rows,columns],
-                                     SbuttonsColour[rows,columns])
+                                     buttonsColour[rows,columns])
                 
 def getButtonClicked(x,y):
     for rows in range(0,8):
