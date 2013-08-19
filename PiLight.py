@@ -63,8 +63,7 @@ TEXTColour = WHITE
 # Initial colour of the matrix buttons displayed
 LEDInitialColour = DARKGRAY
 
-# Background colour
-bgColour = BLACK
+backgroundColour = BLACK
 
 # Set the margin on the x axix
 XMARGIN = int((WINDOWWIDTH - (LEDSIZE*BOARDWIDTH
@@ -151,7 +150,7 @@ def main():
                                      XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                      YMARGIN + 4*(LEDSIZE + BUTTONGAPSIZE))
 
-    # Clear the entira pattern
+    # Clear the entire board
     CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour,GRAY,
                                        XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                        YMARGIN + 5*(LEDSIZE + BUTTONGAPSIZE))
@@ -198,7 +197,7 @@ def main():
         
         
         clickedButton = None # button that was clicked 
-        DISPLAYSURF.fill(bgColour)
+        DISPLAYSURF.fill(backgroundColour)
         drawAllButtons()
 
         # If something is drawn it is shown on the board
@@ -254,6 +253,9 @@ def main():
                 #If the pressed button was SEE - display the pattern 
                 elif clickedButton == BLUE:
                     drawOnBoard = False
+
+                    # If nothing has been selected - skip and allow the
+                    # to select again
                     if pattern == []:
                         drawOnBoard = True
                     else:
@@ -272,6 +274,8 @@ def main():
                             pygame.time.wait(FLASHDELAY)
                         bci.multiplexing(greenArray,redArray,
                                          yellowArray,300)
+
+                        # Turn off all the Leds and clear all arrays 
                         bci.turnOffAll()
                         pattern = []
                         yellowArray = [0,0,0,0,0,0,0,0]
@@ -373,6 +377,7 @@ def main():
                 # Deal with buttons from the matrix pressed
                 else:
                     if drawOnBoard:
+                        # Save the current colour for later use 
                         previousColour = getButtonColour(clickedButton)
                         if clickedButton in pattern:
                             changeButtonColour(clickedButton,pattern)
@@ -392,8 +397,8 @@ def terminate():
     sys.exit()
 
 # Make text appear
-def makeText(text, Colour, bgColour, top, left):
-    textSurf = BASICTEXTFONT.render(text, True, Colour, bgColour)
+def makeText(text, Colour, backgroundColour, top, left):
+    textSurf = BASICTEXTFONT.render(text, True, Colour, backgroundColour)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
@@ -445,7 +450,7 @@ def initialColour(array):
             if buttons[rows,columns] not in array:
                 buttonsColour[rows,columns] = LEDInitialColour
 
-# Light all the Leds that have been selected for some time
+# Light the Leds that have been selected for some time
 def flashColour(Colour, animationSpeed=100):
     for rows in range(0,8):
         for columns in range(0,8):
@@ -569,8 +574,7 @@ def getButtonClicked(x,y):
     elif DEMO_BUTTON.collidepoint((x,y)):
         return PURPLE
     elif CLEAR_BUTTON.collidepoint((x,y)):
-        return GRAY
-    
+        return GRAY    
     return None
 
 # When supplying a row and column number return the corresponding
@@ -718,6 +722,7 @@ def arrayChangeColour(button,previousColour):
 
 ################################# Demo #################################
         
+# Demo of different patterns and words        
    
 def ChristmasTree():
     tree = (buttons[4,0], buttons[3,1], buttons[4,1], buttons[5,1],
@@ -874,7 +879,7 @@ def RaspberryPi():
                 drawButtonWithColour(buttons[rows,columns],DARKGRAY)
     
 
-
+# Display the word HI on the matrix
 def Hi():
     hi = (buttons[1,2], buttons[1,3], buttons[1,4], buttons[1,5],
           buttons[1,6], buttons[2,4], buttons[3,2], buttons[3,3],
@@ -888,13 +893,14 @@ def Hi():
 
     bci.multiplexing(greenArray,redArray,yellowArray,500)
 
-
+# Flash the display and matrix in the same colour 
 def FlashDisplay(colour):
     drawAllButtonsWithColour(colour)
     pygame.display.update()
     bci.turnOnAll(colour)
     pygame.time.wait(500)
-    
+
+# Turn on each LED one after the other    
 def FlashingDot(colour,animationSpeed = 100):
     for rows in range(0,8):
         for columns in range(0,8):

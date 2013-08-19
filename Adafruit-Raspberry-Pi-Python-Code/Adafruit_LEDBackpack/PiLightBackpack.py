@@ -52,15 +52,19 @@ DARKGRAY     = ( 40,  40,  40)
 PURPLE       = ( 75,   0, 130)
 BRIGHTPURPLE = (102,   0, 153)
 GRAY         = (128, 128, 128)
-bgColour = BLACK
+
+backgroundColour = BLACK
 
 # The Colour of the text in the buttons
 TEXTColour = WHITE
 
+# Initial colour of the matrix buttons displayed
 LEDInitialColour = DARKGRAY
 
-XMARGIN = int((WINDOWWIDTH - (LEDSIZE*BOARDWIDTH + (BOARDWIDTH - 1))) / 2 + 60)
-YMARGIN = int((WINDOWHEIGHT - (LEDSIZE*BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
+XMARGIN = int((WINDOWWIDTH - (LEDSIZE*BOARDWIDTH
+                              + (BOARDWIDTH - 1))) / 2 + 60)
+YMARGIN = int((WINDOWHEIGHT - (LEDSIZE*BOARDHEIGHT
+                               + (BOARDHEIGHT - 1))) / 2)
 
 # Rect objects for each of the 64 buttons using a numpy array
 buttons = np.empty((8,8), dtype=object)
@@ -97,11 +101,11 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('Pi Light)
+    pygame.display.set_caption('Pi Light')
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)
-    nfoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
+    infoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
                                    2, WHITE)
     infoSurfTwo = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
                                    2, WHITE)
@@ -114,6 +118,7 @@ def main():
     infoRectThree = infoSurfThree.get_rect()
     infoRectThree.topleft = (10, WINDOWHEIGHT - 20)
 
+    # Sounds to play when a button is pressed
     piano1 = pygame.mixer.Sound('piano-a.wav')
     piano2 = pygame.mixer.Sound('piano-b.wav')
     piano3 = pygame.mixer.Sound('piano-c.wav')
@@ -139,7 +144,7 @@ def main():
                                      XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                      YMARGIN + 4*(LEDSIZE + BUTTONGAPSIZE))
 
-    # Clear the entira pattern
+    # Clear the entire board
     CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour,GRAY,
                                        XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                        YMARGIN + 5*(LEDSIZE + BUTTONGAPSIZE))
@@ -181,7 +186,7 @@ def main():
     while True: # main game loop
 
         clickedButton = None # button that was clicked 
-        DISPLAYSURF.fill(bgColour)
+        DISPLAYSURF.fill(backgroundColour)
         drawAllButtons()
         
         #initialColour()
@@ -199,19 +204,32 @@ def main():
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
+                # If the pressed button was GREEN - allows user to turn on
+                # green LEDs
                 if clickedButton == GREEN:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = GREENMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # yellow LEDs
                 elif clickedButton == YELLOW:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = YELLOWMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # red LEDs
                 elif clickedButton == RED:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = REDMODE
+
+                # If the pressed button was GREEN - allows user to turn off
+                # all coloured LEDs
                 elif clickedButton == DARKGRAY:
                     flashButtonAnimationBig(clickedButton)
                     previousSelection = stateOfSelection
                     stateOfSelection = NONEMODE
+
+                # Clears everything
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
                     if stateOfSelection == NONEMODE:
@@ -225,6 +243,9 @@ def main():
                 #If the pressed button was SEE - display the pattern 
                 elif clickedButton == BLUE:
                     drawOnBoard = False
+                               
+                    # If nothing has been selected - skip and allow the
+                    # to select again
                     if pattern == []:
                         drawOnBoard = True
                     else:
@@ -248,8 +269,9 @@ def main():
                                               getButtonColumn(button),
                                               colour)
                             pygame.time.wait(FLASHDELAY)
-                        #grid.multiplexing(greenArray,redArray,yellowArray,300)
                         pygame.time.wait(5000)
+                               
+                        # Turn off all the Leds and clear all arrays 
                         grid.clear()
                         pattern = []
                         yellowArray = [0,0,0,0,0,0,0,0]
@@ -361,8 +383,8 @@ def terminate():
     sys.exit()
 
 # Make text appear
-def makeText(text, Colour, bgColour, top, left):
-    textSurf = BASICTEXTFONT.render(text, True, Colour, bgColour)
+def makeText(text, Colour, backgroundColour, top, left):
+    textSurf = BASICTEXTFONT.render(text, True, Colour, backgroundColour)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
