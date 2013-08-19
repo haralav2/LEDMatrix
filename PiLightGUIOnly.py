@@ -60,8 +60,7 @@ TEXTColour = WHITE
 # Initial colour of the matrix buttons displayed
 LEDInitialColour = DARKGRAY
 
-# Background colour
-bgColour = BLACK
+backgroundColour = BLACK
 
 # Set the margin on the x axix
 XMARGIN = int((WINDOWWIDTH - (LEDSIZE*BOARDWIDTH
@@ -109,7 +108,7 @@ def main():
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
     BASICTEXTFONT = pygame.font.Font('freesansbold.ttf', 30)
-    nfoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
+    infoSurfOne = BASICFONT.render('Choose your pattern. On your left you can select colours.',
                                    2, WHITE)
     infoSurfTwo = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
                                    2, WHITE)
@@ -148,7 +147,7 @@ def main():
                                      XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                      YMARGIN + 4*(LEDSIZE + BUTTONGAPSIZE))
 
-    # Clear the entira pattern
+    # Clear the entire board
     CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour,GRAY,
                                        XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                        YMARGIN + 5*(LEDSIZE + BUTTONGAPSIZE))
@@ -190,7 +189,7 @@ def main():
     while True: # main game loop
         
         clickedButton = None # button that was clicked 
-        DISPLAYSURF.fill(bgColour)
+        DISPLAYSURF.fill(backgroundColour)
         drawAllButtons()
 
         # If something is drawn it is shown on the board
@@ -206,19 +205,32 @@ def main():
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 mousex, mousey = event.pos
                 clickedButton = getButtonClicked(mousex, mousey)
+                # If the pressed button was GREEN - allows user to turn on
+                # green LEDs
                 if clickedButton == GREEN:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = GREENMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # yellow LEDs
                 elif clickedButton == YELLOW:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = YELLOWMODE
+
+                # If the pressed button was GREEN - allows user to turn on
+                # red LEDs
                 elif clickedButton == RED:
                     flashButtonAnimationBig(clickedButton)
                     stateOfSelection = REDMODE
+
+                # If the pressed button was GREEN - allows user to turn off
+                # all coloured LEDs
                 elif clickedButton == DARKGRAY:
                     flashButtonAnimationBig(clickedButton)
                     previousSelection = stateOfSelection
                     stateOfSelection = NONEMODE
+
+                # Clears everything
                 elif clickedButton == GRAY:
                     flashButtonAnimationBig(clickedButton)
                     if stateOfSelection == NONEMODE:
@@ -232,6 +244,9 @@ def main():
                 #If the pressed button was SEE - display the pattern 
                 elif clickedButton == BLUE:
                     drawOnBoard = False
+
+                    # If nothing has been selected - skip and allow the
+                    # to select again
                     if pattern == []:
                         drawOnBoard = True
                     else:
@@ -244,6 +259,9 @@ def main():
                         for button in pattern:
                             flashColour(button)
                             pygame.time.wait(FLASHDELAY)
+                        pygame.time.wait(5000)
+                        
+                        # Turn off all the Leds and clear all arrays 
                         pattern = []
                         yellowArray = [0,0,0,0,0,0,0,0]
                         greenArray = [0,0,0,0,0,0,0,0]
@@ -347,8 +365,8 @@ def terminate():
     sys.exit()
 
 # Make text appear
-def makeText(text, Colour, bgColour, top, left):
-    textSurf = BASICTEXTFONT.render(text, True, Colour, bgColour)
+def makeText(text, Colour, backgroundColour, top, left):
+    textSurf = BASICTEXTFONT.render(text, True, Colour, backgroundColour)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
