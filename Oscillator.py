@@ -1,15 +1,13 @@
 #!/usr/bin/python
+
 import math
-import wave
-from scipy.io.wavfile import write
-import alsaaudio as aa
 import numpy as np
-import cProfile, pstats, io
+#import cProfile, pstats, io
 from scikits.audiolab import play
 from pylab import plot,show,axis, title, xlabel, ylabel, subplot, suptitle
 import sys
 
-pr = cProfile.Profile()
+#pr = cProfile.Profile()
 
 ''' Generates sine wave samples '''
 def generateLookUpTable(tableLength):
@@ -61,6 +59,7 @@ def generateSineWave(increment, waveTable, phaseIndex=0, soundLength=20,
         indexing = len(waveTable)*soundLength - len(newProduct)
         newProduct = np.hstack((newProduct,product[0:indexing]))
     return newProduct
+
 
 ''' Generate a sine wave by suppling the desired frequency , supplying
     the look-up table is also necessary
@@ -127,15 +126,15 @@ def generateSineWaveRepeat(increment, waveTable, phaseIndex=0,
         newProduct = np.hstack((newProduct,product[0:indexing]))
     return newProduct
 
+
 ''' Generating a square wave by filling an array with only 0s and 1s '''
-def generateSquareWave(tableLength, soundLength=20, amplitude=1):
+def generateSquareWave(tableLength, soundLength=20, amplitude=1, index=0):
     numberOfEntries = 0
     # The sine of the first angle to be put into the matrix
     currentAngle = 0
     # Look up table to store the samples
-    lookUpTable = np.array([0 for x in range(tableLength + 1)]
-                           ,np.float16)
-    index = 0
+    lookUpTable = np.array([0 for x in range(tableLength + 1)],
+                           np.float16)
     while(numberOfEntries != tableLength + 1):
         lookUpTable[numberOfEntries] = (amplitude * float
                                         (math.sin(math.radians
@@ -150,61 +149,52 @@ def generateSquareWave(tableLength, soundLength=20, amplitude=1):
     return lookUpTable
 
 
-'''
-def generateSawtoothWave(tableLength, soundLength=20, amplitude=1):
-    numberOfEntries = 0
-    # The sine of the first angle to be put into the matrix
-    currentAngle = 0
-    # Look up table to store the samples
-    lookUpTable = np.array([0 for x in range(tableLength + 1)],np.float16)
-    index = 0
-    while(numberOfEntries != tableLength + 1):
-        lookUpTable[numberOfEntries] = amplitude * float (math.sin(math.radians(currentAngle)))
-        numberOfEntries += 1
-        if currentAngle == 180:
-            currentAngle = 0
-        if (index % 4) == 0: 
-            currentAngle += 2 * math.pi * width
-        index += 1
-    lookUpTable = np.repeat(lookUpTable,soundLength)
-    return lookUpTable
-'''
-#############################################################
+########################################################################
+
 continuing = True
 print 'Choose how many table entries you would like your look up table to have?'
 number = sys.stdin.read()
 waveTable = generateLookUpTable(int(number))
-print 'Please supply the desired frequncy in Hz'
-suppliedFrequency = sys.stdin.read()
-#print 'Please define an amplitude - default is set to 1'
-#suppliedAmplitude = sys.stdin.read()
-print 'Supply signal length in seconds please'
-suppliedLength = 10*float(sys.stdin.read())
-generated = generateSineWaveFrequency(float(suppliedFrequency),
-                                      waveTable,
-                                      soundLength = suppliedLength)
-plot(np.linspace(0, len(generated)/44100, len(generated)),generated)
-axis([0,0.01,-2,2])
-show()
+while continuing == True:
+    print 'Please supply the desired frequncy in Hz'
+    suppliedFrequency = sys.stdin.read()
+    #print 'Please define an amplitude - default is set to 1'
+    #suppliedAmplitude = sys.stdin.read()
+    print 'Supply signal length in seconds please'
+    suppliedLength = 10*float(sys.stdin.read())
+    generated = generateSineWaveFrequency(float(suppliedFrequency),
+                                          waveTable,
+                                          soundLength = suppliedLength)
+    play(generated)
+    plot(np.linspace(0, len(generated)/44100, len(generated)),generated)
+    axis([0,0.01,-2,2])
+    show()
+    print 'Do you want to make another signal?'
+    text = sys.stdin.read()
+    if (text == "yes\n" or text == "y\n" or text == "yes" or text == "y"):
+        continuing = True
+    else:
+        continuing = False
 
-pr.enable()
+#pr.enable()
 
-###############  Amplitude distortion  ######################
+####################  Amplitude distortion  ############################
+
 tone = generateSineWave(20,waveTable,amplitude=0.7)
-pr.disable()
-s = io.StringIO()
-pstats.Stats(pr).print_stats()
-pr.enable()
+#pr.disable()
+#s = io.StringIO()
+#pstats.Stats(pr).print_stats()
+#pr.enable()
 play(tone)
-pr.disable()
-s = io.StringIO()
-pstats.Stats(pr).print_stats()
+#pr.disable()
+#s = io.StringIO()
+#pstats.Stats(pr).print_stats()
 plot(np.linspace(0, len(tone) / 44100, len(tone)), tone)
 axis([0,0.01,-2,2])
 show()
 
 
-#############################################################
+########################################################################
 
 tone1 = generateSineWave(20,waveTable)
 play(tone1)
@@ -220,7 +210,7 @@ axis([0,0.01,-10,10])
 show()
 play(sawtooth)    
 
-####################  Phase distortion  #####################
+####################  Phase distortion  ################################
 tone2 = generateSineWave(20,waveTable,phaseIndex=500)
 plot(np.linspace(0, len(tone2) / 44100, len(tone2)), tone2)
 axis([0,0.01,-2,2])
@@ -232,12 +222,16 @@ plot(np.linspace(0, len(tone3) / 44100, len(tone3)), tone3)
 axis([0,0.01,-2,2])
 show()
 play(tone3)
-#############################################################
+########################################################################
 
 tone1diff = generateSineWaveRepeat(20,waveTable)
+plot(np.linspace(0, len(tone1diff) / 44100, len(tone1diff)), tone1diff)
+axis([0,0.01,-3,3])
+show()
 play(tone1diff)
 
-####################  Piano keys  ###########################
+####################  Piano keys  ######################################
+
 key50 = generateSineWave(43.3,waveTable)
 play(key50)
 plot(np.linspace(0, len(key50) / 44100, len(key50)), key50)
@@ -267,7 +261,8 @@ plot(np.linspace(0, len(key60) / 44100, len(key60)), key60)
 axis([0,0.01,-2,2])
 show()
 
-#####################  Harmonics  ###########################
+#####################  Harmonics  ######################################
+
 harmonic1 = generateSineWave(40.9,waveTable)
 play(harmonic1)
 harmonic1diff = generateSineWaveFrequency(440,waveTable)
@@ -284,9 +279,11 @@ harmonic4 = generateSineWave(4*40.9,waveTable)
 play(harmonic4)
 harmonic4diff = generateSineWaveFrequency(4*440,waveTable)
 play(harmonic4diff)
-#############################################################
 
-###################  Harmonics distortion  ##################
+########################################################################
+
+###################  Harmonics distortion  #############################
+
 tonesum = tone1 + harmonic4
 subplot(3,1,1)
 plot(np.linspace(0, len(tone1) / 44100, len(tone1)),tone1)
@@ -319,8 +316,7 @@ suptitle('Adding a tone and the 2nd harmonic',fontsize=14,
          fontweight='bold')
 show()
 play(tonesum)
-        
-    
+            
 squaretone = generateSquareWave(4096)
 play(squaretone)
 plot(np.linspace(0, len(squaretone) / 44100,len(squaretone)),squaretone)
