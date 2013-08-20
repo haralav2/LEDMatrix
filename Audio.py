@@ -88,13 +88,13 @@ while len(data) != 0:
    if len(data) == 4*frameSize:
        output.write(data)
        matrix=calculateColumns(data)
-       for i in range (0,8):
-         if (i<=2):
-            Bicolour_Interface.setColumnGreen((1<<matrix[i])-1,~(1<<i))
-         elif (i>2 and i<=5):
-            Bicolour_Interface.setColumnYellow((1<<matrix[i])-1,~(1<<i))
+       for column in range (0,8):
+         if (column<=2):
+            Bicolour_Interface.setColumnGreen(matrix[column],column)
+         elif (column>2 and column<=5):
+            Bicolour_Interface.setColumnYellow(matrix[column],column)
          else:
-            Bicolour_Interface.setColumnRed((1<<matrix[i])-1,~(1<<i))
+            Bicolour_Interface.setColumnRed(matrix[column],column)
          Bicolour_Interface.turnOffAllAudio()
        Bicolour_Interface.turnOffAllAudio()
    data = wavfile.readframes(frameSize)
