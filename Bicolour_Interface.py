@@ -209,19 +209,19 @@ def turnOffAllAudio():
     bus.write_byte_data(ADDRC,PORTB,0xFF)
     bus.write_byte_data(ADDRR,PORTA,0xFF)
 
-''' Turn on a specific column red with spesific number of rows'''
+''' Turn on a specific column red with specific value'''
 def setColumnRed(row,column):
     bus.write_byte_data(ADDRR,PORTA,(1<<row)-1)
     bus.write_byte_data(ADDRC,PORTA,0xFF)
     bus.write_byte_data(ADDRC,PORTB,~(1<<column))
 
-''' Turn on a specific column green '''
+''' Turn on a specific column green with specific value'''
 def setColumnGreen(row,column):
     bus.write_byte_data(ADDRR,PORTA,(1<<row)-1)
     bus.write_byte_data(ADDRC,PORTB,0xFF)
     bus.write_byte_data(ADDRC,PORTA,~(1<<column))
 
-''' Turn on a specific column yellow '''
+''' Turn on a specific column yellow with specific value'''
 def setColumnYellow(row,column):
     bus.write_byte_data(ADDRR,PORTA,(1<<row)-1)
     bus.write_byte_data(ADDRC,PORTB,~(1<<column))
