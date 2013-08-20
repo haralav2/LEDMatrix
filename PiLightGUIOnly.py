@@ -3,6 +3,8 @@
 #########                    PiLight                  ##################
 #########                    Authors                  ################## 
 #########               Veneta Haralampieva           ##################
+#####  The code for this game was developed with the help of  ##########
+#####  this book  http://inventgameswithpython.com/makinggames.pdf  ####
 
 import random
 import sys
@@ -112,7 +114,7 @@ def main():
                                    2, WHITE)
     infoSurfTwo = BASICFONT.render('To unselect a button press NONE. When you are finished press SEE.',
                                    2, WHITE)
-    infoSurfThree = BASICFONT.render('To clear all selection press CLEAR. To see some demos press DEMO',
+    infoSurfThree = BASICFONT.render('To clear all selection press CLEAR. To see some demos press DEMO.',
                                      2, WHITE)
     infoRectOne = infoSurfOne.get_rect()
     infoRectOne.topleft = (10, WINDOWHEIGHT - 60)
@@ -131,7 +133,7 @@ def main():
     piano7 = pygame.mixer.Sound('piano-#f.wav')
     piano8 = pygame.mixer.Sound('piano-g.wav')
 
-    # Change LED colour buttons
+    # Create the change LED colour buttons
     GREEN_SURF,GREEN_BUTTON = makeText(' GREEN  ',TEXTColour,GREEN,
                                        XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                        YMARGIN + 1*(LEDSIZE + BUTTONGAPSIZE))
@@ -142,20 +144,23 @@ def main():
                                    XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                    YMARGIN + 3*(LEDSIZE + BUTTONGAPSIZE))
 
-    # Unselect a single button
+    # Create a button to unselect a single LED
     NONE_SURF,NONE_BUTTON = makeText('  NONE   ',TEXTColour,DARKGRAY,
                                      XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                      YMARGIN + 4*(LEDSIZE + BUTTONGAPSIZE))
 
-    # Clear the entire board
+    # Create a button to clear the entire board
     CLEAR_SURF,CLEAR_BUTTON = makeText(' CLEAR  ',TEXTColour,GRAY,
                                        XMARGIN - 2*(LEDSIZE + BUTTONGAPSIZE),
                                        YMARGIN + 5*(LEDSIZE + BUTTONGAPSIZE))
 
+    # Create a button, which will display the pattern,
+    # selected by the user
     SEE_SURF, SEE_BUTTON = makeText('    SEE     ',TEXTColour,BLUE,
                                     XMARGIN + 1.5*(LEDSIZE + BUTTONGAPSIZE),
                                     YMARGIN + 8*(LEDSIZE + BUTTONGAPSIZE))
 
+    # Create a button to dispaly some demos
     DEMO_SURF, DEMO_BUTTON = makeText('   DEMO   ',TEXTColour,PURPLE,
                                       XMARGIN + 4.5*(LEDSIZE + BUTTONGAPSIZE),
                                       YMARGIN + 8*(LEDSIZE + BUTTONGAPSIZE))
@@ -538,8 +543,7 @@ def getButtonClicked(x,y):
     elif DEMO_BUTTON.collidepoint((x,y)):
         return PURPLE
     elif CLEAR_BUTTON.collidepoint((x,y)):
-        return GRAY
-    
+        return GRAY    
     return None
 
 # When supplying a row and column number return the corresponding
