@@ -39,6 +39,8 @@ class PiLight:
               continuing = True
            else:
               continuing = False
+   text = 'Bye!'
+   Bicolour_Interface.textScroll(colour,text)
    print "\nFinished"
 if __name__ == '__main__':
    variable = PiLight()

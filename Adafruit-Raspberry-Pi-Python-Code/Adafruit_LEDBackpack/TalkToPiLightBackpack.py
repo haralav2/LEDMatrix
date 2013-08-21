@@ -21,7 +21,7 @@ name = sys.stdin.read()
 nameAndGreeting = "\nHello " + name + "I am PiLight!"
 print nameAndGreeting
 grid.textScroll(colour,nameAndGreeting)
-
+grid.clear()
 continuing = True
 
 if len(sys.argv) > 2:
@@ -36,11 +36,12 @@ else:
         grid.textScroll(colour,text)
         print "\nDo you wish to enter more text?"
         text = sys.stdin.read()
-        if (text == "yes\n" or text == "y\n"):
-            
+        if (text == "yes\n" or text == "y\n"):           
             continuing = True
         else:
             continuing = False
-
+text = 'Bye!'
+grid.textScroll(colour,text)
+grid.clear()
 print "\nFinished"
 
