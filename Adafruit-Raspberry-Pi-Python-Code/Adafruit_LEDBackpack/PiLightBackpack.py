@@ -455,27 +455,6 @@ def flashColour(Colour, animationSpeed=100):
                     pygame.display.update()
                     FPSCLOCK.tick(FPS)
                     
-def flashColour(Colour, animationSpeed=100):
-    for rows in range(0,8):
-        for columns in range(0,8):
-            if Colour == buttons[rows,columns]:
-                sound = playSoundForButton(rows)
-                flashColour = getFlashColour(buttons[rows,columns])
-                rectangle = buttons[rows,columns]
-                origSurf = DISPLAYSURF.copy()
-                flashSurf = pygame.Surface((LEDSIZE, LEDSIZE))
-                flashSurf = flashSurf.convert_alpha()
-                r, g, b = flashColour
-                sound.play()
-                pygame.time.wait(200)
-                for alpha in range(0, 255, animationSpeed):
-                    checkForQuit()
-                    DISPLAYSURF.blit(origSurf, (0,0))
-                    flashSurf.fill((r, g, b, alpha))
-                    DISPLAYSURF.blit(flashSurf,rectangle.topleft)
-                    pygame.display.update()
-                    FPSCLOCK.tick(FPS)
-
     
 # Flash the draw, done and see buttons
 def flashButtonAnimationBig(Colour, animationSpeed=50):
@@ -877,13 +856,13 @@ def FlashingDot(colour,animationSpeed = 100):
             flashSurf = pygame.Surface((LEDSIZE, LEDSIZE))
             flashSurf = flashSurf.convert_alpha()
             r, g, b = flashColour
-            colour = 0
+            lightColour = 0
             if flashColour == BRIGHTRED:
-                colour = 2
+                lightColour = 2
             elif flashColour == BRIGHTGREEN:
-                colour = 1
+                lightColour = 1
             elif flashColour == BRIGHTYELLOW:
-                colour = 3
+                lightColour = 3
             for start, end, step in ((0, 255, 1), (255, 0, -1)):
                 for alpha in range(start, end, animationSpeed * step):
                     checkForQuit()
@@ -892,7 +871,7 @@ def FlashingDot(colour,animationSpeed = 100):
                     DISPLAYSURF.blit(flashSurf, rectangle.topleft)
                     pygame.display.update()
                     FPSCLOCK.tick(FPS)
-                    grid.setPixel(rows,columns,colour)
+                    grid.setPixel(rows,columns,lightColour)
                     pygame.time.wait(20)
             grid.clearPixel(rows,columns)
             DISPLAYSURF.blit(origSurf, (0, 0))
